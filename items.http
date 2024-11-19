@@ -1,0 +1,145 @@
+GET http://localhost:3000/items/67168b757a4600bec9734e97 HTTP/1.1
+
+###
+GET http://localhost:3000/items HTTP/1.1
+
+###
+GET http://localhost:3000/comments/ HTTP/1.1
+
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlYTMxMSIsInN1YiI6eyJuYW1lIjoic2VhMzExIn0sImlhdCI6MTcyOTE3NzI2MywiZXhwIjoxNzI5MTc3MjY2fQ.dPPijj8eLH7vLLdMCFNoDVqgSDujI_u9Lwg15cJlwvQ
+###
+GET http://localhost:3000/comments/6735810d7a5e5912791a1943 HTTP/1.1
+
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlYTMxMSIsInN1YiI6eyJuYW1lIjoic2VhMzExIn0sImlhdCI6MTcyOTE3NzI2MywiZXhwIjoxNzI5MTc3MjY2fQ.dPPijj8eLH7vLLdMCFNoDVqgSDujI_u9Lwg15cJlwvQ
+
+###
+PUT http://localhost:3000/items/upvote/67126a83fae17be26091a245 HTTP/1.1
+
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlYTMxMSIsInN1YiI6eyJuYW1lIjoic2VhMzExIn0sImlhdCI6MTcyOTE3NzI2MywiZXhwIjoxNzI5MTc3MjY2fQ.dPPijj8eLH7vLLdMCFNoDVqgSDujI_u9Lwg15cJlwvQ
+###
+PUT http://localhost:3000/items/upVote/67126a83fae17be26091a245 HTTP/1.1
+
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlYTMxMSIsInN1YiI6eyJuYW1lIjoic2VhMzExIn0sImlhdCI6MTcyOTE3NzI2MywiZXhwIjoxNzI5MTc3MjY2fQ.dPPijj8eLH7vLLdMCFNoDVqgSDujI_u9Lwg15cJlwvQ
+
+
+###
+DELETE http://localhost:3000/items/671bfe189111e5086b1b675c HTTP/1.1
+
+###
+
+PUT  http://localhost:3000/comments/comments/newest/pages HTTP/1.1
+content-type: application/json
+
+{
+   "pageNumber": 0
+}
+###
+
+GET http://localhost:3000/comments/comments/findbyIds HTTP/1.1
+content-type: []
+[
+    "6716c71ceb5ec527059af9f5",
+    "6716cc8858708b8b259611ed"
+  ]
+
+###
+
+POST http://localhost:3000/auth/register HTTP/1.1
+content-type: application/json
+
+{
+   "username": "botbot",
+  "password": "pass124124"
+}
+###
+
+POST http://localhost:3000/items HTTP/1.1
+content-type: application/json
+
+ {
+    "title": "AI take over your computer, literally",
+    "url": "https://techcrunch.com/2024/11/13/openais-take-on-ai-agents-could-come-in-january/",
+    "points": 0,
+    "author": "botbot",
+    "isFlagged": 0
+  }
+###
+
+POST http://localhost:3000/jobs HTTP/1.1
+content-type: application/json
+
+ {
+    "title": "this is a j",
+    "url": "https://cointelegraph.com/news/global-crypto-adoption-nears-8-percent-milestone-by-2025",
+    "points": 0,
+    "author": "degen37",
+    "isFlagged": 0
+  }
+  
+###
+
+POST http://localhost:3000/comments HTTP/1.1
+content-type: application/json
+
+ {
+    "comment": "dang",
+    "item": "671bfe189111e5086b1b675c",
+    "points": 0,
+    "author": "degen37",
+    "isFlagged": 0,
+    "replies": []
+  }
+
+###
+
+POST http://localhost:3000/replies HTTP/1.1
+content-type: application/json
+
+ {
+    "reply": "this is a reply 8 of reply 1",
+    "commentId": "67350a0c489c66b39ccc2bee",
+    "parentReply": "67355511a73f7cbe5c9d4cf0",
+    "points": 0,
+    "author": "degen37",
+    "isFlagged": 0
+  }
+###
+
+GET  http://localhost:3000/replies/replies/nested/67355146f2e01f1e5cde3762 HTTP/1.1
+
+###
+###
+
+POST http://localhost:3000/items HTTP/1.1
+content-type: application/json
+
+ {
+    "title": "AskCN: 2222Crypto adoption on track to hit 8% by 2025: Report",
+    "url": "https://cointelegraph.com/news/global-crypto-adoption-nears-8-percent-milestone-by-2025",
+    "points": 1,
+    "timestamp": "600",
+    "author": "degen35",
+    "isFlagged": 0
+  }
+  
+###
+
+POST http://localhost:3000/jobs HTTP/1.1
+content-type: application/json
+
+ {
+    "title": "333333Jobs adoption on track to hit 8% by 2025: Report",
+    "url": "https://cointelegraph.com/news/global-crypto-adoption-nears-8-percent-milestone-by-2025",
+    "isFlagged": 0
+
+  }
+
+###
+
+PUT http://localhost:3000/users/670c0ada8d168db56553b96e HTTP/1.1
+content-type: application/json
+
+{
+    "password": "newpw123"
+}
+

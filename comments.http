@@ -1,0 +1,31 @@
+GET http://localhost:3000/comments HTTP/1.1
+
+###
+DELETE http://localhost:3000/items/67048498e97c38bb5e91630f HTTP/1.1
+
+###
+
+POST http://localhost:3000/comments HTTP/1.1
+content-type: application/json
+
+{
+   "comment": "Crypto adoption on track to hit 8% by 2025: Report",
+  "item": "https://cointelegraph.com/news/global-crypto-adoption-nears-8-percent-milestone-by-2025",
+  "points": 0,
+  "timestamp": "600",
+  "author": "degen37",
+  "isFlagged": 0
+}
+
+
+###
+
+PUT http://localhost:3000/items/670484738c976fc59ed362d8 HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Item 6666",
+    "description": "this is item 6666",
+    "quantity": 6
+}
+
