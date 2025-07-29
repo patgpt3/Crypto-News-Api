@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { User } from './interfaces/users.interface';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserDTO } from './dto/users.dto';
+import { PrivyAuthService } from '../auth/privy-auth.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel('User') private readonly userModel: Model<User>,
+    private readonly privyAuthService: PrivyAuthService,
+  ) {}
   //   private readonly users: User[] = [];
 
   async findAll(): Promise<User[]> {
@@ -54,6 +58,18 @@ export class UsersService {
   }
 
   async create(user: UserDTO) {
+    // If this is a Privy user, verify and create properly
+    if (user.privyId) {
+      const privyUserData = await this.privyAuthService.createUserFromPrivy(
+        user.privyId,
+        user.username,
+        user.authToken // Pass the auth token for verification
+      );
+      const newUser = await new this.userModel(privyUserData);
+      return newUser.save();
+    }
+    
+    // Regular user creation (existing logic)
     const newUser = await new this.userModel(user);
     return newUser.save();
   }
