@@ -9,6 +9,9 @@ export class User extends Document {
   @Prop({ type: String, required: false })
   password: string;
 
+  @Prop({ type: String, required: false, unique: true, sparse: true })
+  privyId: string; // Add Privy ID field
+
   @Prop({ type: String, required: false })
   about: string;
 

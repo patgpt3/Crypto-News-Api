@@ -1,6 +1,7 @@
 export class UserDTO {
   readonly username?: string;
   readonly password?: string;
+  readonly privyId?: string; // Add Privy ID support
   readonly about?: string;
   readonly email?: string;
   readonly created?: string;

@@ -48,6 +48,11 @@ export class UsersService {
     }
   }
 
+  async findByPrivyId(privyId: string): Promise<User> {
+    const findUser = await this.userModel.findOne({ privyId: privyId });
+    return findUser;
+  }
+
   async create(user: UserDTO) {
     const newUser = await new this.userModel(user);
     return newUser.save();

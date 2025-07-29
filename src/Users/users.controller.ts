@@ -51,6 +51,12 @@ export class UsersController {
     return this.usersService.findByUsernameProtected(param.username);
   }
 
+  @Get('find/privy/:privyId')
+  async findByPrivyId(@Param() param): Promise<User> {
+    this.logger.debug('Get User by Privy ID Endpoint');
+    return this.usersService.findByPrivyId(param.privyId);
+  }
+
   @Post()
   async create(@Body() userDTO: UserDTO): Promise<User> {
     this.logger.debug('Create User Endpoint');
