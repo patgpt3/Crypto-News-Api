@@ -4,15 +4,14 @@ import { JobsService } from './jobs.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JobSchema } from './schemas/job.schema';
 import { LoggerService } from 'src/logger/logger.service';
-import { UsersService } from 'src/Users/users.service';
-import { UserSchema } from 'src/Users/schemas/user.schema';
+import { UsersModule } from 'src/Users/users.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Job', schema: JobSchema }]),
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    UsersModule, // Import UsersModule instead of directly providing UsersService
   ],
   controllers: [JobsController],
-  providers: [JobsService, LoggerService, UsersService],
+  providers: [JobsService, LoggerService],
 })
 export class JobsModule {}
