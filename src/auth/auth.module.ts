@@ -2,11 +2,9 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { LoggerService } from 'src/logger/logger.service';
-import { UsersService } from 'src/Users/users.service';
+import { UsersModule } from 'src/Users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './stratagies/local-strategy';
-import { UserSchema } from 'src/Users/schemas/user.schema';
-import { MongooseModule } from '@nestjs/mongoose';
 import { JwtStrategy } from './stratagies/jwt-strategy';
 
 @Module({
@@ -15,13 +13,12 @@ import { JwtStrategy } from './stratagies/jwt-strategy';
       secret: `${process.env.jwt_secret}`,
       signOptions: { expiresIn: '3600' },
     }),
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    UsersModule, // Import UsersModule instead of directly providing UsersService
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     LoggerService,
-    UsersService,
     JwtStrategy,
     LocalStrategy,
   ],
