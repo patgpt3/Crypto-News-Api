@@ -8,6 +8,7 @@ import { LocalStrategy } from './stratagies/local-strategy';
 import { JwtStrategy } from './stratagies/jwt-strategy';
 import { PrivyWebhookController } from './privy-webhook.controller';
 import { PrivyVerifyController } from './privy-verify.controller';
+import { PrivySyncController } from './privy-sync.controller';
 import { PrivyAuthService } from './privy-auth.service';
 
 @Module({
@@ -18,7 +19,7 @@ import { PrivyAuthService } from './privy-auth.service';
     }),
     UsersModule, // Import UsersModule instead of directly providing UsersService
   ],
-  controllers: [AuthController, PrivyWebhookController, PrivyVerifyController],
+  controllers: [AuthController, PrivyWebhookController, PrivyVerifyController, PrivySyncController],
   providers: [
     AuthService,
     LoggerService,
