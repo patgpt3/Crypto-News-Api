@@ -6,6 +6,8 @@ import { UsersModule } from 'src/Users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './stratagies/local-strategy';
 import { JwtStrategy } from './stratagies/jwt-strategy';
+import { PrivyWebhookController } from './privy-webhook.controller';
+import { PrivyAuthService } from './privy-auth.service';
 
 @Module({
   imports: [
@@ -15,12 +17,13 @@ import { JwtStrategy } from './stratagies/jwt-strategy';
     }),
     UsersModule, // Import UsersModule instead of directly providing UsersService
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, PrivyWebhookController],
   providers: [
     AuthService,
     LoggerService,
     JwtStrategy,
     LocalStrategy,
+    PrivyAuthService,
   ],
 })
 export class AuthModule {}
