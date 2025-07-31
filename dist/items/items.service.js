@@ -155,12 +155,19 @@ let ItemsService = class ItemsService {
     }
     async create(item) {
         const newItem = await new this.itemModel(item);
-        const user = await this.usersService.findByUsername(newItem.author);
-        const newSubmissions = user.submissions;
-        newSubmissions?.push(newItem.id);
-        this.usersService.update(user.id, {
-            submissions: newSubmissions || [newItem.id],
-        });
+        try {
+            const user = await this.usersService.findByUsername(newItem.author);
+            if (user) {
+                const newSubmissions = user.submissions || [];
+                newSubmissions.push(newItem.id);
+                await this.usersService.update(user.id, {
+                    submissions: newSubmissions,
+                });
+            }
+        }
+        catch (error) {
+            console.log('Warning: Could not update user submissions:', error.message);
+        }
         return newItem.save();
     }
     async delete(id) {

@@ -180,12 +180,22 @@ export class ItemsService {
 
   async create(item: ItemDTO) {
     const newItem = await new this.itemModel(item);
-    const user = await this.usersService.findByUsername(newItem.author);
-    const newSubmissions = user.submissions;
-    newSubmissions?.push(newItem.id);
-    this.usersService.update(user.id, {
-      submissions: newSubmissions || [newItem.id],
-    });
+    
+    // Try to find user by username and update their submissions
+    try {
+      const user = await this.usersService.findByUsername(newItem.author);
+      if (user) {
+        const newSubmissions = user.submissions || [];
+        newSubmissions.push(newItem.id);
+        await this.usersService.update(user.id, {
+          submissions: newSubmissions,
+        });
+      }
+    } catch (error) {
+      console.log('Warning: Could not update user submissions:', error.message);
+      // Continue with item creation even if user update fails
+    }
+    
     return newItem.save();
   }
   async delete(id: string): Promise<Item> {
