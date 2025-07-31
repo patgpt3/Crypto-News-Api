@@ -20,11 +20,23 @@ export declare class ItemsController {
     findAllNewestPagination(param: any, page: {
         pageNumber: number;
     }): Promise<Item[]>;
+    findAllNewestPaginationByCategory(param: any, page: {
+        pageNumber: number;
+        cat: string;
+    }): Promise<Item[]>;
     findAllAskPagination(param: any, page: {
         pageNumber: number;
     }): Promise<Item[]>;
+    findAllAskPaginationByCategory(param: any, page: {
+        pageNumber: number;
+        cat: string;
+    }): Promise<Item[]>;
     findAllShowPagination(param: any, page: {
         pageNumber: number;
+    }): Promise<Item[]>;
+    findAllShowPaginationByCategory(param: any, page: {
+        pageNumber: number;
+        cat: string;
     }): Promise<Item[]>;
     findAllShow(): Promise<Item[]>;
     findAllAsk(): Promise<Item[]>;

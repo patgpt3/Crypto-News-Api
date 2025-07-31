@@ -111,6 +111,19 @@ let ItemsService = class ItemsService {
             .exec();
         return itemsMain;
     }
+    async findAllNewestPaginationByCategory(page, category) {
+        const pageSize = 30;
+        const skip = page * pageSize;
+        const itemsNewest = await this.itemModel
+            .find({ category: category })
+            .sort({
+            createdAt: -1,
+        })
+            .skip(skip)
+            .limit(pageSize)
+            .exec();
+        return itemsNewest;
+    }
     async findAllAskPagination(page) {
         const pageSize = 30;
         const skip = page * pageSize;
@@ -124,6 +137,19 @@ let ItemsService = class ItemsService {
             .exec();
         return itemsMain;
     }
+    async findAllAskPaginationByCategory(page, category) {
+        const pageSize = 30;
+        const skip = page * pageSize;
+        const itemsAsk = await this.itemModel
+            .find({ category: category, title: { $regex: '^Ask', $options: 'i' } })
+            .sort({
+            createdAt: -1,
+        })
+            .skip(skip)
+            .limit(pageSize)
+            .exec();
+        return itemsAsk;
+    }
     async findAllShowPagination(page) {
         const pageSize = 30;
         const skip = page * pageSize;
@@ -136,6 +162,19 @@ let ItemsService = class ItemsService {
             .limit(pageSize)
             .exec();
         return itemsMain;
+    }
+    async findAllShowPaginationByCategory(page, category) {
+        const pageSize = 30;
+        const skip = page * pageSize;
+        const itemsShow = await this.itemModel
+            .find({ category: category, title: { $regex: '^Show', $options: 'i' } })
+            .sort({
+            createdAt: -1,
+        })
+            .skip(skip)
+            .limit(pageSize)
+            .exec();
+        return itemsShow;
     }
     async findAllShow() {
         const findAllI = await this.itemModel.find().exec();

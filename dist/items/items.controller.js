@@ -57,14 +57,29 @@ let ItemsController = class ItemsController {
         const fa = await this.itemsService.findAllNewestPagination(page.pageNumber);
         return fa;
     }
+    async findAllNewestPaginationByCategory(param, page) {
+        this.logger.debug('Get All New Items Pages by Category Endpoint');
+        const fa = await this.itemsService.findAllNewestPaginationByCategory(page.pageNumber, page.cat);
+        return fa;
+    }
     async findAllAskPagination(param, page) {
         this.logger.debug('Get All Ask Items Pages Endpoint');
         const fa = await this.itemsService.findAllAskPagination(page.pageNumber);
         return fa;
     }
+    async findAllAskPaginationByCategory(param, page) {
+        this.logger.debug('Get All Ask Items Pages by Category Endpoint');
+        const fa = await this.itemsService.findAllAskPaginationByCategory(page.pageNumber, page.cat);
+        return fa;
+    }
     async findAllShowPagination(param, page) {
         this.logger.debug('Get All Show Items Pages Endpoint');
         const fa = await this.itemsService.findAllShowPagination(page.pageNumber);
+        return fa;
+    }
+    async findAllShowPaginationByCategory(param, page) {
+        this.logger.debug('Get All Show Items Pages by Category Endpoint');
+        const fa = await this.itemsService.findAllShowPaginationByCategory(page.pageNumber, page.cat);
         return fa;
     }
     async findAllShow() {
@@ -173,6 +188,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ItemsController.prototype, "findAllNewestPagination", null);
 __decorate([
+    (0, common_1.Put)('newest/pages/cat'),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ItemsController.prototype, "findAllNewestPaginationByCategory", null);
+__decorate([
     (0, common_1.Put)('ask/pages'),
     __param(0, (0, common_1.Param)()),
     __param(1, (0, common_1.Body)()),
@@ -181,6 +204,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ItemsController.prototype, "findAllAskPagination", null);
 __decorate([
+    (0, common_1.Put)('ask/pages/cat'),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ItemsController.prototype, "findAllAskPaginationByCategory", null);
+__decorate([
     (0, common_1.Put)('show/pages'),
     __param(0, (0, common_1.Param)()),
     __param(1, (0, common_1.Body)()),
@@ -188,6 +219,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ItemsController.prototype, "findAllShowPagination", null);
+__decorate([
+    (0, common_1.Put)('show/pages/cat'),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ItemsController.prototype, "findAllShowPaginationByCategory", null);
 __decorate([
     (0, common_1.Get)('show'),
     __metadata("design:type", Function),

@@ -81,6 +81,16 @@ export class ItemsController {
     return fa;
   }
 
+  @Put('newest/pages/cat')
+  async findAllNewestPaginationByCategory(
+    @Param() param,
+    @Body() page: { pageNumber: number; cat: string },
+  ): Promise<Item[]> {
+    this.logger.debug('Get All New Items Pages by Category Endpoint');
+    const fa = await this.itemsService.findAllNewestPaginationByCategory(page.pageNumber, page.cat);
+    return fa;
+  }
+
   @Put('ask/pages')
   async findAllAskPagination(
     @Param() param,
@@ -91,6 +101,16 @@ export class ItemsController {
     return fa;
   }
 
+  @Put('ask/pages/cat')
+  async findAllAskPaginationByCategory(
+    @Param() param,
+    @Body() page: { pageNumber: number; cat: string },
+  ): Promise<Item[]> {
+    this.logger.debug('Get All Ask Items Pages by Category Endpoint');
+    const fa = await this.itemsService.findAllAskPaginationByCategory(page.pageNumber, page.cat);
+    return fa;
+  }
+
   @Put('show/pages')
   async findAllShowPagination(
     @Param() param,
@@ -98,6 +118,16 @@ export class ItemsController {
   ): Promise<Item[]> {
     this.logger.debug('Get All Show Items Pages Endpoint');
     const fa = await this.itemsService.findAllShowPagination(page.pageNumber);
+    return fa;
+  }
+
+  @Put('show/pages/cat')
+  async findAllShowPaginationByCategory(
+    @Param() param,
+    @Body() page: { pageNumber: number; cat: string },
+  ): Promise<Item[]> {
+    this.logger.debug('Get All Show Items Pages by Category Endpoint');
+    const fa = await this.itemsService.findAllShowPaginationByCategory(page.pageNumber, page.cat);
     return fa;
   }
 

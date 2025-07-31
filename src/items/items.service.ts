@@ -123,6 +123,22 @@ export class ItemsService {
     return itemsMain;
   }
 
+  async findAllNewestPaginationByCategory(page: number, category: string): Promise<Item[]> {
+    const pageSize = 30;
+    const skip = page * pageSize;
+
+    const itemsNewest = await this.itemModel
+      .find({ category: category })
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(pageSize)
+      .exec();
+
+    return itemsNewest;
+  }
+
   async findAllAskPagination(page: number): Promise<Item[]> {
     const pageSize = 30;
     const skip = page * pageSize;
@@ -139,6 +155,22 @@ export class ItemsService {
     return itemsMain;
   }
 
+  async findAllAskPaginationByCategory(page: number, category: string): Promise<Item[]> {
+    const pageSize = 30;
+    const skip = page * pageSize;
+
+    const itemsAsk = await this.itemModel
+      .find({ category: category, title: { $regex: '^Ask', $options: 'i' } })
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(pageSize)
+      .exec();
+
+    return itemsAsk;
+  }
+
   async findAllShowPagination(page: number): Promise<Item[]> {
     const pageSize = 30;
     const skip = page * pageSize;
@@ -153,6 +185,22 @@ export class ItemsService {
       .exec();
 
     return itemsMain;
+  }
+
+  async findAllShowPaginationByCategory(page: number, category: string): Promise<Item[]> {
+    const pageSize = 30;
+    const skip = page * pageSize;
+
+    const itemsShow = await this.itemModel
+      .find({ category: category, title: { $regex: '^Show', $options: 'i' } })
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(pageSize)
+      .exec();
+
+    return itemsShow;
   }
 
   async findAllShow(): Promise<Item[]> {

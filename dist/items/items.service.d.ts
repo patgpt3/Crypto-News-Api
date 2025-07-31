@@ -15,8 +15,11 @@ export declare class ItemsService {
     findAllMainPagination(page: number): Promise<Item[]>;
     findAllMainPaginationByCategory(page: number, category: string): Promise<Item[]>;
     findAllNewestPagination(page: number): Promise<Item[]>;
+    findAllNewestPaginationByCategory(page: number, category: string): Promise<Item[]>;
     findAllAskPagination(page: number): Promise<Item[]>;
+    findAllAskPaginationByCategory(page: number, category: string): Promise<Item[]>;
     findAllShowPagination(page: number): Promise<Item[]>;
+    findAllShowPaginationByCategory(page: number, category: string): Promise<Item[]>;
     findAllShow(): Promise<Item[]>;
     findAllAsk(): Promise<Item[]>;
     findById(id: string): Promise<Item>;
