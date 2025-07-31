@@ -12,6 +12,10 @@ export declare class CommentsController {
     findAllNewestPagination(param: any, page: {
         pageNumber: number;
     }): Promise<Comment[]>;
+    findAllNewestPaginationByCategory(param: any, page: {
+        pageNumber: number;
+        cat: string;
+    }): Promise<Comment[]>;
     findbyIds(idsObj: {
         comments: string[];
     }): Promise<Comment[]>;

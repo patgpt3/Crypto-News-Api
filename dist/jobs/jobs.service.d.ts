@@ -9,6 +9,7 @@ export declare class JobsService {
     findAll(): Promise<Job[]>;
     findAllNewest(): Promise<Job[]>;
     findAllNewestPagination(page: number): Promise<Job[]>;
+    findAllNewestPaginationByCategory(page: number, category: string): Promise<Job[]>;
     findById(id: string): Promise<Job>;
     create(job: JobDTO): Promise<import("mongoose").Document<unknown, {}, Job> & Job & {
         _id: import("mongoose").Types.ObjectId;

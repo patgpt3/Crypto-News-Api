@@ -46,6 +46,22 @@ export class CommentsService {
     return itemsMain;
   }
 
+  async findAllNewestPaginationByCategory(page: number, category: string): Promise<Comment[]> {
+    const pageSize = 30;
+    const skip = page * pageSize;
+
+    const commentsNewest = await this.commentModel
+      .find({ category: category })
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(pageSize)
+      .exec();
+
+    return commentsNewest;
+  }
+
   async findById(id: string): Promise<Comment> {
     return id.match(/^[0-9a-fA-F]{24}$/)
       ? await this.commentModel.findOne({ _id: id })

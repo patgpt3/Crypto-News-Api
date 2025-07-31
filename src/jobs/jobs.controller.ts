@@ -72,6 +72,16 @@ export class JobsController {
     return fa;
   }
 
+  @Put('jobs/newest/pages/cat')
+  async findAllNewestPaginationByCategory(
+    @Param() param,
+    @Body() page: { pageNumber: number; cat: string },
+  ): Promise<Job[]> {
+    this.logger.debug('Get All New Jobs Pages by Category Endpoint');
+    const fa = await this.jobsService.findAllNewestPaginationByCategory(page.pageNumber, page.cat);
+    return fa;
+  }
+
   @Post()
   async create(@Body() jobDTO: JobDTO): Promise<Job> {
     this.logger.debug('Create Job Endpoint');

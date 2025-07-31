@@ -41,6 +41,11 @@ let CommentsController = class CommentsController {
         const fa = await this.commentsService.findAllNewestPagination(page.pageNumber);
         return fa;
     }
+    async findAllNewestPaginationByCategory(param, page) {
+        this.logger.debug('Get All New Comments Pages by Category Endpoint');
+        const fa = await this.commentsService.findAllNewestPaginationByCategory(page.pageNumber, page.cat);
+        return fa;
+    }
     async findbyIds(idsObj) {
         this.logger.debug('Get All Comments by Ids Endpoint');
         const results = [];
@@ -111,6 +116,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], CommentsController.prototype, "findAllNewestPagination", null);
+__decorate([
+    (0, common_1.Put)('comments/newest/pages/cat'),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], CommentsController.prototype, "findAllNewestPaginationByCategory", null);
 __decorate([
     (0, common_1.Post)('comments/findbyIds'),
     __param(0, (0, common_1.Body)()),

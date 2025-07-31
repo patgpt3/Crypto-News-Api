@@ -11,6 +11,7 @@ export declare class CommentsService {
     findAll(): Promise<Comment[]>;
     findAllNewest(): Promise<Comment[]>;
     findAllNewestPagination(page: number): Promise<Comment[]>;
+    findAllNewestPaginationByCategory(page: number, category: string): Promise<Comment[]>;
     findById(id: string): Promise<Comment>;
     create(comment: CommentDTO): Promise<import("mongoose").Document<unknown, {}, Comment> & Comment & {
         _id: import("mongoose").Types.ObjectId;

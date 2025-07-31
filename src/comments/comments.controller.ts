@@ -51,6 +51,19 @@ export class CommentsController {
     return fa;
   }
 
+  @Put('comments/newest/pages/cat')
+  async findAllNewestPaginationByCategory(
+    @Param() param,
+    @Body() page: { pageNumber: number; cat: string },
+  ): Promise<Comment[]> {
+    this.logger.debug('Get All New Comments Pages by Category Endpoint');
+    const fa = await this.commentsService.findAllNewestPaginationByCategory(
+      page.pageNumber,
+      page.cat,
+    );
+    return fa;
+  }
+
   @Post('comments/findbyIds')
   async findbyIds(@Body() idsObj: { comments: string[] }): Promise<Comment[]> {
     this.logger.debug('Get All Comments by Ids Endpoint');

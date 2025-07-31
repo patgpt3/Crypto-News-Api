@@ -59,6 +59,11 @@ let JobsController = class JobsController {
         const fa = await this.jobsService.findAllNewestPagination(page.pageNumber);
         return fa;
     }
+    async findAllNewestPaginationByCategory(param, page) {
+        this.logger.debug('Get All New Jobs Pages by Category Endpoint');
+        const fa = await this.jobsService.findAllNewestPaginationByCategory(page.pageNumber, page.cat);
+        return fa;
+    }
     async create(jobDTO) {
         this.logger.debug('Create Job Endpoint');
         const createI = await this.jobsService.create(jobDTO);
@@ -108,6 +113,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], JobsController.prototype, "findAllNewestPagination", null);
+__decorate([
+    (0, common_1.Put)('jobs/newest/pages/cat'),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], JobsController.prototype, "findAllNewestPaginationByCategory", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),

@@ -15,6 +15,10 @@ export declare class JobsController {
     findAllNewestPagination(param: any, page: {
         pageNumber: number;
     }): Promise<Job[]>;
+    findAllNewestPaginationByCategory(param: any, page: {
+        pageNumber: number;
+        cat: string;
+    }): Promise<Job[]>;
     create(jobDTO: JobDTO): Promise<Job>;
     update(param: any, jobDTO: JobDTO): Promise<Job>;
     delete(param: any): Promise<Job>;

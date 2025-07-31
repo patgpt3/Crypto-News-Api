@@ -42,6 +42,22 @@ export class JobsService {
     return itemsMain;
   }
 
+  async findAllNewestPaginationByCategory(page: number, category: string): Promise<Job[]> {
+    const pageSize = 30;
+    const skip = page * pageSize;
+
+    const jobsNewest = await this.jobModel
+      .find({ category: category })
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(pageSize)
+      .exec();
+
+    return jobsNewest;
+  }
+
   async findById(id: string): Promise<Job> {
     return id.match(/^[0-9a-fA-F]{24}$/)
       ? await this.jobModel.findOne({ _id: id })
