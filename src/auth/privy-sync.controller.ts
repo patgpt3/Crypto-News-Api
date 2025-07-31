@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { PrivyAuthService } from './privy-auth.service';
 import { UsersService } from '../Users/users.service';
 
@@ -13,6 +13,11 @@ export class PrivySyncController {
   async createUserInPrivy(@Body() body: { privyId: string; username: string; email?: string }) {
     try {
       console.log('🔄 Creating user in Privy:', body);
+      
+      // Validate input
+      if (!body.privyId || !body.username) {
+        throw new HttpException('privyId and username are required', HttpStatus.BAD_REQUEST);
+      }
       
       // Check if user already exists in our database
       const existingUser = await this.usersService.findByPrivyId(body.privyId);
@@ -54,7 +59,10 @@ export class PrivySyncController {
       };
     } catch (error) {
       console.error('❌ Error creating user:', error);
-      throw error;
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -63,7 +71,42 @@ export class PrivySyncController {
     return { 
       success: true, 
       message: 'Sync endpoint is working',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      privyConfigured: !!process.env.PRIVY_API_KEY
     };
+  }
+
+  @Get('health')
+  async healthCheck() {
+    try {
+      // Test database connection by trying to find users
+      const userCount = await this.usersService.findAll();
+      const dbStatus = { connected: true, userCount: userCount.length };
+      
+      // Test Privy configuration
+      const privyStatus = {
+        apiKeyConfigured: !!process.env.PRIVY_API_KEY,
+        appIdConfigured: !!process.env.PRIVY_APP_ID,
+        appId: process.env.PRIVY_APP_ID || 'cm4g4hzw102g3hlf5jgx0rxf9'
+      };
+      
+      return {
+        success: true,
+        timestamp: new Date().toISOString(),
+        database: dbStatus,
+        privy: privyStatus,
+        environment: {
+          nodeEnv: process.env.NODE_ENV,
+          port: process.env.PORT || 3000
+        }
+      };
+    } catch (error) {
+      console.error('Health check failed:', error);
+      return {
+        success: false,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      };
+    }
   }
 } 

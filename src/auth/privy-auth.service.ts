@@ -7,18 +7,20 @@ import * as jwksClient from 'jwks-rsa';
 export class PrivyAuthService {
   private jwksClient: any;
   private privyApiKey: string;
+  private privyAppId: string;
 
   constructor(private configService: ConfigService) {
     // Initialize JWKS client for Privy
+    this.privyAppId = this.configService.get<string>('privy.appId') || 'cm4g4hzw102g3hlf5jgx0rxf9';
     this.jwksClient = jwksClient({
-      jwksUri: 'https://auth.privy.io/api/v1/apps/cm4g4hzw102g3hlf5jgx0rxf9/jwks.json',
+      jwksUri: `https://auth.privy.io/api/v1/apps/${this.privyAppId}/jwks.json`,
       cache: true,
       cacheMaxEntries: 5,
       cacheMaxAge: 600000, // 10 minutes
     });
 
     // Get Privy API key from environment
-    this.privyApiKey = this.configService.get<string>('PRIVY_API_KEY');
+    this.privyApiKey = this.configService.get<string>('privy.apiKey');
   }
 
   async verifyPrivyToken(token: string): Promise<any> {
@@ -34,7 +36,7 @@ export class PrivyAuthService {
       const verified = jwt.verify(token, publicKey, {
         algorithms: ['ES256'],
         issuer: 'https://auth.privy.io',
-        audience: 'cm4g4hzw102g3hlf5jgx0rxf9', // Your Privy App ID
+        audience: this.privyAppId,
       });
 
       return verified;
@@ -63,7 +65,7 @@ export class PrivyAuthService {
       // If we have an API key, verify user with Privy API
       if (this.privyApiKey) {
         try {
-          const response = await fetch(`https://auth.privy.io/api/v1/apps/cm4g4hzw102g3hlf5jgx0rxf9/users/${privyId}`, {
+          const response = await fetch(`https://auth.privy.io/api/v1/apps/${this.privyAppId}/users/${privyId}`, {
             headers: {
               'Authorization': `Bearer ${this.privyApiKey}`,
               'Content-Type': 'application/json',
@@ -133,7 +135,7 @@ export class PrivyAuthService {
     }
 
     try {
-      const response = await fetch(`https://auth.privy.io/api/v1/apps/cm4g4hzw102g3hlf5jgx0rxf9/users/${privyId}`, {
+      const response = await fetch(`https://auth.privy.io/api/v1/apps/${this.privyAppId}/users/${privyId}`, {
         headers: {
           'Authorization': `Bearer ${this.privyApiKey}`,
           'Content-Type': 'application/json',

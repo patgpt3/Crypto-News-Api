@@ -3,7 +3,7 @@ import { Get, Inject } from '@nestjs/common';
 
 import { LoggerService } from 'src/logger/logger.service';
 import { UsersService } from 'src/Users/users.service';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 // import * as jwt from 'jsonwebtoken';
 import { User } from 'src/Users/interfaces/users.interface';
