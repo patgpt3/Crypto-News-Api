@@ -9,6 +9,7 @@ export declare class Reply extends Document {
     author: string;
     replies: any[];
     isFlagged: number;
+    category: string;
 }
 export declare const ReplySchema: import("mongoose").Schema<Reply, import("mongoose").Model<Reply, any, any, any, Document<unknown, any, Reply> & Reply & {
     _id: Types.ObjectId;

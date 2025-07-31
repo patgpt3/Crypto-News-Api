@@ -27,6 +27,9 @@ export class Reply extends Document {
 
   @Prop({ type: Number, required: false })
   isFlagged: number;
+
+  @Prop({ type: String, required: false })
+  category: string;
 }
 
 export const ReplySchema = SchemaFactory.createForClass(Reply);

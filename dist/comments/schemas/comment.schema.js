@@ -39,6 +39,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Number, required: true }),
     __metadata("design:type", Number)
 ], Comment.prototype, "isFlagged", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, required: false }),
+    __metadata("design:type", String)
+], Comment.prototype, "category", void 0);
 exports.Comment = Comment = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Comment);

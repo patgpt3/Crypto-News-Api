@@ -35,6 +35,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: String, required: false }),
     __metadata("design:type", String)
 ], Job.prototype, "author", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, required: false }),
+    __metadata("design:type", String)
+], Job.prototype, "category", void 0);
 exports.Job = Job = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Job);

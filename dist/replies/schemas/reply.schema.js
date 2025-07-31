@@ -48,6 +48,10 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Number, required: false }),
     __metadata("design:type", Number)
 ], Reply.prototype, "isFlagged", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: String, required: false }),
+    __metadata("design:type", String)
+], Reply.prototype, "category", void 0);
 exports.Reply = Reply = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Reply);

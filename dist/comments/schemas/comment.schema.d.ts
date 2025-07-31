@@ -6,6 +6,7 @@ export declare class Comment extends Document {
     author: string;
     replies: string[];
     isFlagged: number;
+    category: string;
 }
 export declare const CommentSchema: import("mongoose").Schema<Comment, import("mongoose").Model<Comment, any, any, any, Document<unknown, any, Comment> & Comment & {
     _id: import("mongoose").Types.ObjectId;

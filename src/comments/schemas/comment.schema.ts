@@ -20,6 +20,9 @@ export class Comment extends Document {
 
   @Prop({ type: Number, required: true })
   isFlagged: number;
+
+  @Prop({ type: String, required: false })
+  category: string;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
