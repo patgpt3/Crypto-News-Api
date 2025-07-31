@@ -46,7 +46,11 @@ let UsersController = class UsersController {
     }
     async findByPrivyId(param) {
         this.logger.debug('Get User by Privy ID Endpoint');
-        return this.usersService.findByPrivyId(param.privyId);
+        const user = await this.usersService.findByPrivyId(param.privyId);
+        if (!user) {
+            throw new common_1.HttpException('User not found', common_1.HttpStatus.NOT_FOUND);
+        }
+        return user;
     }
     async create(userDTO) {
         this.logger.debug('Create User Endpoint');

@@ -7,6 +7,8 @@ import {
   Inject,
   Put,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserDTO } from './dto/users.dto';
 import { User } from './interfaces/users.interface';
@@ -54,7 +56,11 @@ export class UsersController {
   @Get('find/privy/:privyId')
   async findByPrivyId(@Param() param): Promise<User> {
     this.logger.debug('Get User by Privy ID Endpoint');
-    return this.usersService.findByPrivyId(param.privyId);
+    const user = await this.usersService.findByPrivyId(param.privyId);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return user;
   }
 
   @Post()
