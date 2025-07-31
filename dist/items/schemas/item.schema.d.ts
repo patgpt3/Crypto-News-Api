@@ -7,6 +7,7 @@ export declare class Item extends Document {
     author: string;
     comments: string[];
     isFlagged: number;
+    category: string;
 }
 export declare const ItemSchema: import("mongoose").Schema<Item, import("mongoose").Model<Item, any, any, any, Document<unknown, any, Item> & Item & {
     _id: import("mongoose").Types.ObjectId;
