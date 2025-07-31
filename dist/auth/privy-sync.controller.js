@@ -63,6 +63,12 @@ let PrivySyncController = class PrivySyncController {
             if (error instanceof common_1.HttpException) {
                 throw error;
             }
+            if (error.message === 'Username already exists') {
+                throw new common_1.HttpException('Username already exists', common_1.HttpStatus.CONFLICT);
+            }
+            if (error.message === 'User already exists with this wallet') {
+                throw new common_1.HttpException('User already exists with this wallet', common_1.HttpStatus.CONFLICT);
+            }
             throw new common_1.HttpException('Internal server error', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

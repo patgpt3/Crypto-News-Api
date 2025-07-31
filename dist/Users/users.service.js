@@ -59,6 +59,14 @@ let UsersService = class UsersService {
         return findUser;
     }
     async create(user) {
+        const existingUser = await this.findByUsername(user.username);
+        if (existingUser) {
+            throw new Error('Username already exists');
+        }
+        const existingPrivyUser = await this.findByPrivyId(user.privyId);
+        if (existingPrivyUser) {
+            throw new Error('User already exists with this wallet');
+        }
         const newUser = await new this.userModel(user);
         return newUser.save();
     }

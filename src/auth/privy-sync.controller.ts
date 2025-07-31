@@ -62,6 +62,15 @@ export class PrivySyncController {
       if (error instanceof HttpException) {
         throw error;
       }
+      
+      // Handle specific user creation errors
+      if (error.message === 'Username already exists') {
+        throw new HttpException('Username already exists', HttpStatus.CONFLICT);
+      }
+      if (error.message === 'User already exists with this wallet') {
+        throw new HttpException('User already exists with this wallet', HttpStatus.CONFLICT);
+      }
+      
       throw new HttpException('Internal server error', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

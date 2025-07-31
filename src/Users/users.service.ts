@@ -58,6 +58,18 @@ export class UsersService {
   }
 
   async create(user: UserDTO) {
+    // Check if username already exists
+    const existingUser = await this.findByUsername(user.username);
+    if (existingUser) {
+      throw new Error('Username already exists');
+    }
+    
+    // Check if privyId already exists
+    const existingPrivyUser = await this.findByPrivyId(user.privyId);
+    if (existingPrivyUser) {
+      throw new Error('User already exists with this wallet');
+    }
+    
     // For now, create user directly without Privy verification to avoid 500 errors
     // The frontend already has the Privy user authenticated
     const newUser = await new this.userModel(user);
