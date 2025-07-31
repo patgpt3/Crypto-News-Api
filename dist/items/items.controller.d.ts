@@ -13,6 +13,10 @@ export declare class ItemsController {
     findAllMainPagination(param: any, page: {
         pageNumber: number;
     }): Promise<Item[]>;
+    findAllMainPaginationByCategory(param: any, page: {
+        pageNumber: number;
+        cat: string;
+    }): Promise<Item[]>;
     findAllNewestPagination(param: any, page: {
         pageNumber: number;
     }): Promise<Item[]>;

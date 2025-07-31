@@ -61,6 +61,16 @@ export class ItemsController {
     return fa;
   }
 
+  @Put('main/pages/cat')
+  async findAllMainPaginationByCategory(
+    @Param() param,
+    @Body() page: { pageNumber: number; cat: string },
+  ): Promise<Item[]> {
+    this.logger.debug('Get All Main Items Pages by Category Endpoint');
+    const fa = await this.itemsService.findAllMainPaginationByCategory(page.pageNumber, page.cat);
+    return fa;
+  }
+
   @Put('newest/pages')
   async findAllNewestPagination(
     @Param() param,

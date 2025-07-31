@@ -72,6 +72,32 @@ let ItemsService = class ItemsService {
         ]);
         return itemsMain;
     }
+    async findAllMainPaginationByCategory(page, category) {
+        const pageSize = 30;
+        const skip = page * pageSize;
+        const itemsMain = await this.itemModel.aggregate([
+            { $match: { category: category } },
+            {
+                $addFields: {
+                    customScore: {
+                        $divide: [
+                            '$points',
+                            {
+                                $multiply: [
+                                    { $log10: { $subtract: [new Date(), '$createdAt'] } },
+                                    6,
+                                ],
+                            },
+                        ],
+                    },
+                },
+            },
+            { $sort: { customScore: -1 } },
+            { $skip: skip },
+            { $limit: pageSize },
+        ]);
+        return itemsMain;
+    }
     async findAllNewestPagination(page) {
         const pageSize = 30;
         const skip = page * pageSize;

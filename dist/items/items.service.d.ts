@@ -13,6 +13,7 @@ export declare class ItemsService {
     findAllNewest(): Promise<Item[]>;
     findAllMain(): Promise<Item[]>;
     findAllMainPagination(page: number): Promise<Item[]>;
+    findAllMainPaginationByCategory(page: number, category: string): Promise<Item[]>;
     findAllNewestPagination(page: number): Promise<Item[]>;
     findAllAskPagination(page: number): Promise<Item[]>;
     findAllShowPagination(page: number): Promise<Item[]>;

@@ -59,11 +59,6 @@ let UsersService = class UsersService {
         return findUser;
     }
     async create(user) {
-        if (user.privyId) {
-            const privyUserData = await this.privyAuthService.createUserFromPrivy(user.privyId, user.username, user.authToken);
-            const newUser = await new this.userModel(privyUserData);
-            return newUser.save();
-        }
         const newUser = await new this.userModel(user);
         return newUser.save();
     }

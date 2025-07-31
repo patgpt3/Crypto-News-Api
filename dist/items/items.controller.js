@@ -47,6 +47,11 @@ let ItemsController = class ItemsController {
         const fa = await this.itemsService.findAllMainPagination(page.pageNumber);
         return fa;
     }
+    async findAllMainPaginationByCategory(param, page) {
+        this.logger.debug('Get All Main Items Pages by Category Endpoint');
+        const fa = await this.itemsService.findAllMainPaginationByCategory(page.pageNumber, page.cat);
+        return fa;
+    }
     async findAllNewestPagination(param, page) {
         this.logger.debug('Get All New Items Pages Endpoint');
         const fa = await this.itemsService.findAllNewestPagination(page.pageNumber);
@@ -151,6 +156,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ItemsController.prototype, "findAllMainPagination", null);
+__decorate([
+    (0, common_1.Put)('main/pages/cat'),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], ItemsController.prototype, "findAllMainPaginationByCategory", null);
 __decorate([
     (0, common_1.Put)('newest/pages'),
     __param(0, (0, common_1.Param)()),
