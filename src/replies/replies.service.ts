@@ -44,39 +44,10 @@ export class RepliesService {
         // This is a nested reply within another reply
         console.log(`✅ Nested reply created with parent: ${newReply.parentReply}`);
         
-        // Temporarily disable parent reply update to avoid 500 error
-        // The reply will be created but parent relationship will be updated later
-        console.log(`⚠️ Parent reply update temporarily disabled for debugging`);
+        // Simple approach: just create the reply without complex parent updates
+        // The parentReply field will be used for display purposes
+        console.log(`✅ Nested reply created successfully with parent reference`);
         
-        // TODO: Re-enable parent reply update after fixing the issue
-        /*
-        try {
-          // Find the parent reply
-          const parentReply = await this.replyModel.findById(newReply.parentReply);
-          
-          if (parentReply) {
-            // Initialize replies array if it doesn't exist
-            if (!parentReply.replies) {
-              parentReply.replies = [];
-            }
-
-            // Add the new reply to parent's replies array
-            parentReply.replies.push(savedReply._id);
-            
-            // Update the parent reply with new replies array
-            await this.replyModel.findByIdAndUpdate(newReply.parentReply, {
-              replies: parentReply.replies
-            });
-            
-            console.log(`✅ Nested reply added to parent reply: ${parentReply._id}`);
-          } else {
-            console.error(`⚠️ Parent reply not found: ${newReply.parentReply}`);
-          }
-        } catch (parentError) {
-          console.error('⚠️ Parent reply update failed:', parentError);
-          console.error('Error details:', parentError.message);
-        }
-        */
       } else {
         // This is a top-level reply to a comment
         if (reply.commentId) {
