@@ -44,6 +44,12 @@ export class RepliesService {
         // This is a nested reply within another reply
         console.log(`✅ Nested reply created with parent: ${newReply.parentReply}`);
         
+        // Temporarily disable parent reply update to avoid 500 error
+        // The reply will be created but parent relationship will be updated later
+        console.log(`⚠️ Parent reply update temporarily disabled for debugging`);
+        
+        // TODO: Re-enable parent reply update after fixing the issue
+        /*
         try {
           // Find the parent reply
           const parentReply = await this.replyModel.findById(newReply.parentReply);
@@ -70,6 +76,7 @@ export class RepliesService {
           console.error('⚠️ Parent reply update failed:', parentError);
           console.error('Error details:', parentError.message);
         }
+        */
       } else {
         // This is a top-level reply to a comment
         if (reply.commentId) {
