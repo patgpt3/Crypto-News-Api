@@ -7,6 +7,6 @@ export class ReplyDTO {
   readonly points?: number;
   readonly createdAt?: Date;
   readonly author?: string;
-  readonly replies?: any[];
+  readonly replies?: ObjectId[];
   readonly isFlagged?: number;
 }

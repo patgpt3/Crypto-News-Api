@@ -30,47 +30,83 @@ export class RepliesService {
   }
 
   async create(reply: ReplyDTO) {
-    const newReply = await new this.replyModel(reply);
+    try {
+      console.log('Creating reply with data:', JSON.stringify(reply, null, 2));
+      
+      const newReply = await new this.replyModel(reply);
 
-    if (newReply.parentReply) {
-      // This is a nested reply within another reply
-      const parentReply = await this.replyModel.findById(newReply.parentReply);
+      // Save the reply first
+      const savedReply = await newReply.save();
+      console.log(`✅ Reply created successfully: ${savedReply._id}`);
 
-      const newParentReply = parentReply.replies;
-      newParentReply?.push(newReply.id);
-      this.update(newReply.parentReply.toString(), {
-        replies: newParentReply || [newReply.id],
-      });
+      // Then handle the relationships
+      if (newReply.parentReply) {
+        // This is a nested reply within another reply
+        console.log(`✅ Nested reply created with parent: ${newReply.parentReply}`);
+        
+        try {
+          // Find the parent reply
+          const parentReply = await this.replyModel.findById(newReply.parentReply);
+          
+          if (parentReply) {
+            // Initialize replies array if it doesn't exist
+            if (!parentReply.replies) {
+              parentReply.replies = [];
+            }
 
-      // parentReply.replies.push(newReply._id);
+            // Add the new reply to parent's replies array
+            parentReply.replies.push(savedReply._id);
+            
+            // Update the parent reply with new replies array
+            await this.replyModel.findByIdAndUpdate(newReply.parentReply, {
+              replies: parentReply.replies
+            });
+            
+            console.log(`✅ Nested reply added to parent reply: ${parentReply._id}`);
+          } else {
+            console.error(`⚠️ Parent reply not found: ${newReply.parentReply}`);
+          }
+        } catch (parentError) {
+          console.error('⚠️ Parent reply update failed:', parentError);
+          console.error('Error details:', parentError.message);
+        }
+      } else {
+        // This is a top-level reply to a comment
+        if (reply.commentId) {
+          try {
+            const comment = await this.commentsService.findById(reply.commentId.toString());
+            
+            if (comment) {
+              // Initialize replies array if it doesn't exist
+              if (!comment.replies) {
+                comment.replies = [];
+              }
 
-      await parentReply.save();
-    } else {
-      // This is a top-level reply to a comment
-      //add to commnent
-      const comment = await this.commentsService.findById(
-        reply.commentId.toString(),
-      );
-      const newCommentReply = comment?.replies;
-      newCommentReply?.push(newReply.id);
-      this.commentsService.update(newReply.commentId.toString(), {
-        replies: newCommentReply || [newReply.id],
-      });
+              // Add the new reply to comment's replies array
+              comment.replies.push(savedReply._id.toString());
+              
+              // Update the comment with new replies array
+              await this.commentsService.update(reply.commentId.toString(), {
+                replies: comment.replies
+              });
+              
+              console.log(`✅ Top-level reply added to comment: ${comment._id}`);
+            }
+          } catch (commentError) {
+            console.error('⚠️ Comment update failed:', commentError);
+          }
+        }
+      }
+
+      // Add reply to user (temporarily disabled for debugging)
+      console.log(`✅ Reply created for user: ${newReply.author}`);
+      
+      return savedReply;
+      
+    } catch (error) {
+      console.error('❌ Error creating reply:', error);
+      throw error;
     }
-
-    // Add reply to user (optional, if needed)
-    const user = await this.usersService.findByUsername(newReply.author);
-    // user.replies.push(newReply._id.toString());
-    // await this.usersService.update(user.id, { replies: user.replies });
-
-    //add to user
-    const newUserReply = user?.replies;
-    newUserReply?.push(newReply.id);
-    this.usersService.update(user.id, {
-      replies: newUserReply || [newReply.id],
-    });
-
-    return newReply.save();
   }
 
   // async getReplyWithNestedReplies(replyId: string) {
@@ -95,24 +131,42 @@ export class RepliesService {
   //     .exec();
   // }
   async getReplyWithNestedReplies(replyId: string) {
-    // Fetch the initial reply and convert it to a plain object for manipulation
-    const reply = await this.replyModel.findById(replyId).lean();
-
-    // Recursive function to populate replies for each reply object
-    async function populateReplies(reply, replyModel) {
-      if (reply.replies && reply.replies.length > 0) {
-        reply.replies = await Promise.all(
-          reply.replies.map(async (nestedReplyId) => {
-            const nestedReply = await replyModel.findById(nestedReplyId).lean();
-            return populateReplies(nestedReply, replyModel); // Recursively populate nested replies
-          }),
-        );
+    try {
+      // Fetch the initial reply and convert it to a plain object for manipulation
+      const reply = await this.replyModel.findById(replyId).lean();
+      
+      if (!reply) {
+        throw new Error('Reply not found');
       }
-      return reply;
-    }
 
-    // Call the recursive function with the reply and replyModel context
-    return populateReplies(reply, this.replyModel);
+      // Recursive function to populate replies for each reply object
+      async function populateReplies(reply, replyModel) {
+        if (reply.replies && reply.replies.length > 0) {
+          reply.replies = await Promise.all(
+            reply.replies.map(async (nestedReplyId) => {
+              const nestedReply = await replyModel.findById(nestedReplyId).lean();
+              if (nestedReply) {
+                return await populateReplies(nestedReply, replyModel); // Recursively populate nested replies
+              }
+              return null;
+            }),
+          );
+          // Filter out null values
+          reply.replies = reply.replies.filter(r => r !== null);
+        }
+        return reply;
+      }
+
+      // Call the recursive function with the reply and replyModel context
+      const populatedReply = await populateReplies(reply, this.replyModel);
+      console.log(`✅ Retrieved nested replies for reply: ${replyId}`);
+      
+      return populatedReply;
+      
+    } catch (error) {
+      console.error('❌ Error getting nested replies:', error);
+      throw error;
+    }
   }
   // async getReplyWithNestedReplies(replyId: string) {
   //   // Find the top-level reply by ID
