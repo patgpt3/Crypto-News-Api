@@ -8,6 +8,7 @@ export declare class ItemsService {
     private readonly commentModel;
     private usersService;
     constructor(itemModel: Model<Item>, commentModel: Model<Comment>, usersService: UsersService);
+    private calculateHNScore;
     findAll(): Promise<Item[]>;
     findAllPast(): Promise<Item[]>;
     findAllNewest(): Promise<Item[]>;

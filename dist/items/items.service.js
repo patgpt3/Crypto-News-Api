@@ -23,6 +23,11 @@ let ItemsService = class ItemsService {
         this.commentModel = commentModel;
         this.usersService = usersService;
     }
+    calculateHNScore(points, createdAt) {
+        const now = Date.now();
+        const timeInHours = (now - createdAt.getTime()) / 1000 / 3600;
+        return (points - 1) / Math.pow(timeInHours + 2, 1.5);
+    }
     async findAll() {
         const findAllI = await this.itemModel.find().exec();
         return findAllI;
@@ -43,8 +48,11 @@ let ItemsService = class ItemsService {
     }
     async findAllMain() {
         const findAllI = await this.itemModel.find().exec();
-        const itemsMain = findAllI.sort((a, b) => b.points / (Math.log(Date.now() - b.createdAt.getTime()) * 6) -
-            a.points / (Math.log(Date.now() - a.createdAt.getTime()) * 6));
+        const itemsMain = findAllI.sort((a, b) => {
+            const scoreA = this.calculateHNScore(a.points, a.createdAt);
+            const scoreB = this.calculateHNScore(b.points, b.createdAt);
+            return scoreB - scoreA;
+        });
         return itemsMain;
     }
     async findAllMainPagination(page) {
@@ -53,18 +61,28 @@ let ItemsService = class ItemsService {
         const itemsMain = await this.itemModel.aggregate([
             {
                 $addFields: {
+                    timeInHours: {
+                        $divide: [
+                            { $subtract: [new Date(), '$createdAt'] },
+                            1000 * 3600
+                        ]
+                    }
+                },
+            },
+            {
+                $addFields: {
                     customScore: {
                         $divide: [
-                            '$points',
+                            { $subtract: ['$points', 1] },
                             {
-                                $multiply: [
-                                    { $log10: { $subtract: [new Date(), '$createdAt'] } },
-                                    6,
-                                ],
-                            },
-                        ],
-                    },
-                },
+                                $pow: [
+                                    { $add: ['$timeInHours', 2] },
+                                    1.5
+                                ]
+                            }
+                        ]
+                    }
+                }
             },
             { $sort: { customScore: -1 } },
             { $skip: skip },
@@ -79,18 +97,28 @@ let ItemsService = class ItemsService {
             { $match: { category: category } },
             {
                 $addFields: {
+                    timeInHours: {
+                        $divide: [
+                            { $subtract: [new Date(), '$createdAt'] },
+                            1000 * 3600
+                        ]
+                    }
+                },
+            },
+            {
+                $addFields: {
                     customScore: {
                         $divide: [
-                            '$points',
+                            { $subtract: ['$points', 1] },
                             {
-                                $multiply: [
-                                    { $log10: { $subtract: [new Date(), '$createdAt'] } },
-                                    6,
-                                ],
-                            },
-                        ],
-                    },
-                },
+                                $pow: [
+                                    { $add: ['$timeInHours', 2] },
+                                    1.5
+                                ]
+                            }
+                        ]
+                    }
+                }
             },
             { $sort: { customScore: -1 } },
             { $skip: skip },

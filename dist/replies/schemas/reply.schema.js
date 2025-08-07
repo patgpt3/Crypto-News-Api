@@ -21,7 +21,7 @@ __decorate([
     __metadata("design:type", String)
 ], Reply.prototype, "reply", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Comment', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Comment', required: false }),
     __metadata("design:type", mongodb_1.ObjectId)
 ], Reply.prototype, "commentId", void 0);
 __decorate([
@@ -41,7 +41,7 @@ __decorate([
     __metadata("design:type", String)
 ], Reply.prototype, "author", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Reply', required: false }),
+    (0, mongoose_1.Prop)({ type: [mongoose_2.Types.ObjectId], ref: 'Reply', required: false, default: [] }),
     __metadata("design:type", Array)
 ], Reply.prototype, "replies", void 0);
 __decorate([

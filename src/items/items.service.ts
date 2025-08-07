@@ -13,6 +13,19 @@ export class ItemsService {
     @InjectModel('Comment') private readonly commentModel: Model<Comment>,
     @Inject(UsersService) private usersService: UsersService,
   ) {}
+
+  /**
+   * Calculate Hacker News ranking score
+   * Formula: (points - 1) / (time + 2)^1.5
+   * @param points Number of upvotes
+   * @param createdAt Post creation time
+   * @returns HN ranking score
+   */
+  private calculateHNScore(points: number, createdAt: Date): number {
+    const now = Date.now();
+    const timeInHours = (now - createdAt.getTime()) / 1000 / 3600;
+    return (points - 1) / Math.pow(timeInHours + 2, 1.5);
+  }
   //   private readonly items: Item[] = [];
 
   async findAll(): Promise<Item[]> {
@@ -41,12 +54,11 @@ export class ItemsService {
   async findAllMain(): Promise<Item[]> {
     const findAllI = await this.itemModel.find().exec();
 
-    const itemsMain = findAllI.sort(
-      (a, b) =>
-        b.points / (Math.log(Date.now() - b.createdAt.getTime()) * 6) -
-        a.points / (Math.log(Date.now() - a.createdAt.getTime()) * 6),
-      // Math.pow(item.points, Date.now() - item.createdAt.getTime()),
-    );
+    const itemsMain = findAllI.sort((a, b) => {
+      const scoreA = this.calculateHNScore(a.points, a.createdAt);
+      const scoreB = this.calculateHNScore(b.points, b.createdAt);
+      return scoreB - scoreA;
+    });
     return itemsMain;
   }
 
@@ -57,18 +69,29 @@ export class ItemsService {
     const itemsMain = await this.itemModel.aggregate([
       {
         $addFields: {
+          // Hacker News ranking algorithm: (points - 1) / (time + 2)^1.5
+          timeInHours: {
+            $divide: [
+              { $subtract: [new Date(), '$createdAt'] },
+              1000 * 3600 // Convert to hours
+            ]
+          }
+        },
+      },
+      {
+        $addFields: {
           customScore: {
             $divide: [
-              '$points',
+              { $subtract: ['$points', 1] },
               {
-                $multiply: [
-                  { $log10: { $subtract: [new Date(), '$createdAt'] } },
-                  6,
-                ],
-              },
-            ],
-          },
-        },
+                $pow: [
+                  { $add: ['$timeInHours', 2] },
+                  1.5
+                ]
+              }
+            ]
+          }
+        }
       },
       { $sort: { customScore: -1 } },
       { $skip: skip },
@@ -86,18 +109,29 @@ export class ItemsService {
       { $match: { category: category } },
       {
         $addFields: {
+          // Hacker News ranking algorithm: (points - 1) / (time + 2)^1.5
+          timeInHours: {
+            $divide: [
+              { $subtract: [new Date(), '$createdAt'] },
+              1000 * 3600 // Convert to hours
+            ]
+          }
+        },
+      },
+      {
+        $addFields: {
           customScore: {
             $divide: [
-              '$points',
+              { $subtract: ['$points', 1] },
               {
-                $multiply: [
-                  { $log10: { $subtract: [new Date(), '$createdAt'] } },
-                  6,
-                ],
-              },
-            ],
-          },
-        },
+                $pow: [
+                  { $add: ['$timeInHours', 2] },
+                  1.5
+                ]
+              }
+            ]
+          }
+        }
       },
       { $sort: { customScore: -1 } },
       { $skip: skip },

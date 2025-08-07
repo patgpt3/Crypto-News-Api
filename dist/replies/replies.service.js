@@ -37,44 +37,70 @@ let RepliesService = class RepliesService {
         }
     }
     async create(reply) {
-        const newReply = await new this.replyModel(reply);
-        if (newReply.parentReply) {
-            const parentReply = await this.replyModel.findById(newReply.parentReply);
-            const newParentReply = parentReply.replies;
-            newParentReply?.push(newReply.id);
-            this.update(newReply.parentReply.toString(), {
-                replies: newParentReply || [newReply.id],
-            });
-            await parentReply.save();
+        try {
+            console.log('Creating reply with data:', JSON.stringify(reply, null, 2));
+            const newReply = await new this.replyModel(reply);
+            const savedReply = await newReply.save();
+            console.log(`✅ Reply created successfully: ${savedReply._id}`);
+            if (newReply.parentReply) {
+                console.log(`✅ Nested reply created with parent: ${newReply.parentReply}`);
+                console.log(`✅ Nested reply created successfully with parent reference`);
+            }
+            else {
+                if (reply.commentId) {
+                    try {
+                        const comment = await this.commentsService.findById(reply.commentId.toString());
+                        if (comment) {
+                            if (!comment.replies) {
+                                comment.replies = [];
+                            }
+                            comment.replies.push(savedReply._id.toString());
+                            await this.commentsService.update(reply.commentId.toString(), {
+                                replies: comment.replies
+                            });
+                            console.log(`✅ Top-level reply added to comment: ${reply.commentId}`);
+                        }
+                    }
+                    catch (commentError) {
+                        console.error('⚠️ Comment update failed:', commentError);
+                    }
+                }
+            }
+            console.log(`✅ Reply created for user: ${newReply.author}`);
+            return savedReply;
         }
-        else {
-            const comment = await this.commentsService.findById(reply.commentId.toString());
-            const newCommentReply = comment?.replies;
-            newCommentReply?.push(newReply.id);
-            this.commentsService.update(newReply.commentId.toString(), {
-                replies: newCommentReply || [newReply.id],
-            });
+        catch (error) {
+            console.error('❌ Error creating reply:', error);
+            throw error;
         }
-        const user = await this.usersService.findByUsername(newReply.author);
-        const newUserReply = user?.replies;
-        newUserReply?.push(newReply.id);
-        this.usersService.update(user.id, {
-            replies: newUserReply || [newReply.id],
-        });
-        return newReply.save();
     }
     async getReplyWithNestedReplies(replyId) {
-        const reply = await this.replyModel.findById(replyId).lean();
-        async function populateReplies(reply, replyModel) {
-            if (reply.replies && reply.replies.length > 0) {
-                reply.replies = await Promise.all(reply.replies.map(async (nestedReplyId) => {
-                    const nestedReply = await replyModel.findById(nestedReplyId).lean();
-                    return populateReplies(nestedReply, replyModel);
-                }));
+        try {
+            const reply = await this.replyModel.findById(replyId).lean();
+            if (!reply) {
+                throw new Error('Reply not found');
             }
-            return reply;
+            async function populateReplies(reply, replyModel) {
+                if (reply.replies && reply.replies.length > 0) {
+                    reply.replies = await Promise.all(reply.replies.map(async (nestedReplyId) => {
+                        const nestedReply = await replyModel.findById(nestedReplyId).lean();
+                        if (nestedReply) {
+                            return await populateReplies(nestedReply, replyModel);
+                        }
+                        return null;
+                    }));
+                    reply.replies = reply.replies.filter(r => r !== null);
+                }
+                return reply;
+            }
+            const populatedReply = await populateReplies(reply, this.replyModel);
+            console.log(`✅ Retrieved nested replies for reply: ${replyId}`);
+            return populatedReply;
         }
-        return populateReplies(reply, this.replyModel);
+        catch (error) {
+            console.error('❌ Error getting nested replies:', error);
+            throw error;
+        }
     }
     async delete(id) {
         return this.replyModel.findByIdAndDelete(id);

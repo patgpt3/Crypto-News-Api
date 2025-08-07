@@ -6,6 +6,6 @@ export interface Reply {
     points?: number;
     createdAt?: Date;
     author?: string;
-    replies?: any[];
+    replies?: ObjectId[];
     isFlagged?: number;
 }

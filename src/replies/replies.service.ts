@@ -68,7 +68,7 @@ export class RepliesService {
                 replies: comment.replies
               });
               
-              console.log(`✅ Top-level reply added to comment: ${comment._id}`);
+              console.log(`✅ Top-level reply added to comment: ${reply.commentId}`);
             }
           } catch (commentError) {
             console.error('⚠️ Comment update failed:', commentError);

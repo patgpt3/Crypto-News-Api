@@ -7,7 +7,7 @@ export declare class Reply extends Document {
     points: number;
     createdAt: string;
     author: string;
-    replies: any[];
+    replies: Types.ObjectId[];
     isFlagged: number;
     category: string;
 }
