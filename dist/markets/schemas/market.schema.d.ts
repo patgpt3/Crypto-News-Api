@@ -13,9 +13,11 @@ export declare const OutcomeSchema: Schema<any, import("mongoose").Model<any, an
 }> & {
     _id: import("mongoose").Types.ObjectId;
 }>;
+declare const CATEGORY_VALUES: readonly ["crypto", "ai", "memecoins", "depin", "nft", "desci", "film", "gaming"];
 export declare const MarketSchema: Schema<any, import("mongoose").Model<any, any, any, any, any, any>, {}, {}, {}, {}, {
     collection: string;
 }, {
+    category: "crypto" | "ai" | "memecoins" | "depin" | "nft" | "desci" | "film" | "gaming";
     createdAt: Date;
     question: string;
     outcomes: import("mongoose").Types.DocumentArray<{
@@ -28,6 +30,7 @@ export declare const MarketSchema: Schema<any, import("mongoose").Model<any, any
     description?: string;
     winningOutcomeId?: string;
 }, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<{
+    category: "crypto" | "ai" | "memecoins" | "depin" | "nft" | "desci" | "film" | "gaming";
     createdAt: Date;
     question: string;
     outcomes: import("mongoose").Types.DocumentArray<{
@@ -40,6 +43,7 @@ export declare const MarketSchema: Schema<any, import("mongoose").Model<any, any
     description?: string;
     winningOutcomeId?: string;
 }>> & import("mongoose").FlatRecord<{
+    category: "crypto" | "ai" | "memecoins" | "depin" | "nft" | "desci" | "film" | "gaming";
     createdAt: Date;
     question: string;
     outcomes: import("mongoose").Types.DocumentArray<{
@@ -54,3 +58,4 @@ export declare const MarketSchema: Schema<any, import("mongoose").Model<any, any
 }> & {
     _id: import("mongoose").Types.ObjectId;
 }>;
+export { CATEGORY_VALUES };

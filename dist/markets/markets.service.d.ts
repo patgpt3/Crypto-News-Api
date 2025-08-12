@@ -28,13 +28,14 @@ export declare class MarketsService {
     private readonly marketModel;
     private readonly positionModel;
     constructor(marketModel: Model<MarketDoc>, positionModel: Model<PositionDoc>);
-    list(q?: string): Promise<(import("mongoose").FlattenMaps<MarketDoc> & Required<{
+    list(q?: string, category?: string): Promise<(import("mongoose").FlattenMaps<MarketDoc> & Required<{
         _id: string;
     }>)[]>;
     get(id: string): Promise<import("mongoose").FlattenMaps<MarketDoc> & Required<{
         _id: string;
     }>>;
     create(input: {
+        category: string;
         question: string;
         description?: string;
         outcomes: string[];

@@ -30,6 +30,7 @@ export const MarketSchema = new Schema(
     resolved: { type: Boolean, default: false },
     winningOutcomeId: { type: String },
     author: { type: String },
+    points: { type: Number, default: 0 },
   },
   { collection: 'markets' }
 );
@@ -37,6 +38,7 @@ export const MarketSchema = new Schema(
 // Indexes to keep category queries fast and avoid cross-category bleed in listings
 MarketSchema.index({ category: 1, createdAt: -1 });
 MarketSchema.index({ category: 1, question: 1 });
+MarketSchema.index({ category: 1, points: -1, createdAt: -1 });
 
 export { CATEGORY_VALUES };
 

@@ -19,13 +19,17 @@ let MarketsController = class MarketsController {
     constructor(markets) {
         this.markets = markets;
     }
-    async list(q) {
-        return this.markets.list(q);
+    async list(q, category) {
+        return this.markets.list(q, category);
     }
     async get(id) {
         return this.markets.get(id);
     }
     async create(body) {
+        if (!body?.category) {
+            throw new Error('category is required');
+        }
+        body.category = body.category.toLowerCase();
         return this.markets.create(body);
     }
     async bet(id, body) {
@@ -39,8 +43,9 @@ exports.MarketsController = MarketsController;
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('q')),
+    __param(1, (0, common_1.Query)('category')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], MarketsController.prototype, "list", null);
 __decorate([

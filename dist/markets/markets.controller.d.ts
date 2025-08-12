@@ -2,13 +2,14 @@ import { MarketsService } from './markets.service';
 export declare class MarketsController {
     private readonly markets;
     constructor(markets: MarketsService);
-    list(q?: string): Promise<(import("mongoose").FlattenMaps<import("./markets.service").MarketDoc> & Required<{
+    list(q?: string, category?: string): Promise<(import("mongoose").FlattenMaps<import("./markets.service").MarketDoc> & Required<{
         _id: string;
     }>)[]>;
     get(id: string): Promise<import("mongoose").FlattenMaps<import("./markets.service").MarketDoc> & Required<{
         _id: string;
     }>>;
     create(body: {
+        category: string;
         question: string;
         description?: string;
         outcomes: string[];

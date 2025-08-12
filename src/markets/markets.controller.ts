@@ -6,8 +6,12 @@ export class MarketsController {
   constructor(private readonly markets: MarketsService) {}
 
   @Get()
-  async list(@Query('q') q?: string, @Query('category') category?: string) {
-    return this.markets.list(q, category);
+  async list(
+    @Query('q') q?: string,
+    @Query('category') category?: string,
+    @Query('sort') sort?: 'top' | 'new',
+  ) {
+    return this.markets.list(q, category, sort);
   }
 
   @Get(':id')
@@ -35,6 +39,11 @@ export class MarketsController {
   @Get(':id/positions')
   async positions(@Param('id') id: string, @Query('userId') userId?: string) {
     return this.markets.listPositions(id, userId);
+  }
+
+  @Post(':id/upvote')
+  async upvote(@Param('id') id: string) {
+    return this.markets.upvote(id);
   }
 }
 

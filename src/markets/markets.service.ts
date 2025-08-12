@@ -37,7 +37,7 @@ export class MarketsService {
     @InjectModel('Position') private readonly positionModel: Model<PositionDoc>,
   ) {}
 
-  async list(q?: string, category?: string) {
+  async list(q?: string, category?: string, sort?: 'top' | 'new') {
     const where: any = {};
     if (q) {
       where.$or = [
@@ -48,7 +48,8 @@ export class MarketsService {
     if (category) {
       where.category = category.toLowerCase();
     }
-    return this.marketModel.find(where).sort({ createdAt: -1 }).lean();
+    const order = sort === 'new' ? { createdAt: -1 } : { points: -1, createdAt: -1 };
+    return this.marketModel.find(where).sort(order).lean();
   }
 
   async get(id: string) {
@@ -68,8 +69,15 @@ export class MarketsService {
       createdAt: new Date(),
       resolved: false,
       author: input.author,
+      points: 0,
     });
     return created.toObject();
+  }
+
+  async upvote(id: string) {
+    const updated = await this.marketModel.findByIdAndUpdate(id, { $inc: { points: 1 } }, { new: true });
+    if (!updated) throw new NotFoundException('Market not found');
+    return { ok: true, points: (updated as any).points };
   }
 
   async placeBet(marketId: string, params: { outcomeId: string; amount: number; userId?: string }) {

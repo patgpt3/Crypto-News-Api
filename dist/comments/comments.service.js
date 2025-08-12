@@ -52,7 +52,7 @@ let CommentsService = class CommentsService {
         const pageSize = 30;
         const skip = page * pageSize;
         const commentsNewest = await this.commentModel
-            .find({ category: category })
+            .find({ category: category?.toLowerCase() })
             .sort({
             createdAt: -1,
         })
@@ -71,6 +71,9 @@ let CommentsService = class CommentsService {
     }
     async create(comment) {
         const newComment = await new this.commentModel(comment);
+        if (newComment.category) {
+            newComment.category = newComment.category.toLowerCase();
+        }
         const user = await this.usersService.findByUsername(newComment.author);
         const newUserComment = user.comments;
         newUserComment?.push(newComment.id);

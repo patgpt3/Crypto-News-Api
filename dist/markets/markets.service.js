@@ -21,13 +21,17 @@ let MarketsService = class MarketsService {
         this.marketModel = marketModel;
         this.positionModel = positionModel;
     }
-    async list(q) {
-        const where = q
-            ? { $or: [
-                    { question: { $regex: q, $options: 'i' } },
-                    { description: { $regex: q, $options: 'i' } },
-                ] }
-            : {};
+    async list(q, category) {
+        const where = {};
+        if (q) {
+            where.$or = [
+                { question: { $regex: q, $options: 'i' } },
+                { description: { $regex: q, $options: 'i' } },
+            ];
+        }
+        if (category) {
+            where.category = category.toLowerCase();
+        }
         return this.marketModel.find(where).sort({ createdAt: -1 }).lean();
     }
     async get(id) {
@@ -39,6 +43,7 @@ let MarketsService = class MarketsService {
     async create(input) {
         const outcomes = (input.outcomes || []).filter(Boolean).map(label => ({ label, probability: 1 / Math.max(2, input.outcomes.length) }));
         const created = await this.marketModel.create({
+            category: (input.category || 'crypto').toLowerCase(),
             question: input.question.trim(),
             description: input.description?.trim(),
             outcomes,

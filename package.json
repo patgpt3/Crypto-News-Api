@@ -32,6 +32,8 @@
     "@nestjs/passport": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@privy-io/server-auth": "^1.28.8",
+    "@solana/web3.js": "^1.98.4",
+    "@switchboard-xyz/solana.js": "^3.2.5",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "jsonwebtoken": "^9.0.2",
