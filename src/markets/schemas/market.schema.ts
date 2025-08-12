@@ -10,6 +10,7 @@ export const OutcomeSchema = new Schema(
 
 export const MarketSchema = new Schema(
   {
+    category: { type: String, required: true },
     question: { type: String, required: true },
     description: { type: String },
     outcomes: { type: [OutcomeSchema], required: true },

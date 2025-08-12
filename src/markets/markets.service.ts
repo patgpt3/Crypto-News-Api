@@ -37,13 +37,17 @@ export class MarketsService {
     @InjectModel('Position') private readonly positionModel: Model<PositionDoc>,
   ) {}
 
-  async list(q?: string) {
-    const where = q
-      ? { $or: [
-          { question: { $regex: q, $options: 'i' } },
-          { description: { $regex: q, $options: 'i' } },
-        ] }
-      : {};
+  async list(q?: string, category?: string) {
+    const where: any = {};
+    if (q) {
+      where.$or = [
+        { question: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } },
+      ];
+    }
+    if (category) {
+      where.category = category.toLowerCase();
+    }
     return this.marketModel.find(where).sort({ createdAt: -1 }).lean();
   }
 
@@ -53,9 +57,10 @@ export class MarketsService {
     return m;
   }
 
-  async create(input: { question: string; description?: string; outcomes: string[]; author?: string }) {
+  async create(input: { category: string; question: string; description?: string; outcomes: string[]; author?: string }) {
     const outcomes = (input.outcomes || []).filter(Boolean).map(label => ({ label, probability: 1 / Math.max(2, input.outcomes.length) }));
     const created = await this.marketModel.create({
+      category: (input.category || 'crypto').toLowerCase(),
       question: input.question.trim(),
       description: input.description?.trim(),
       outcomes,

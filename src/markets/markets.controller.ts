@@ -6,8 +6,8 @@ export class MarketsController {
   constructor(private readonly markets: MarketsService) {}
 
   @Get()
-  async list(@Query('q') q?: string) {
-    return this.markets.list(q);
+  async list(@Query('q') q?: string, @Query('category') category?: string) {
+    return this.markets.list(q, category);
   }
 
   @Get(':id')
@@ -16,7 +16,7 @@ export class MarketsController {
   }
 
   @Post()
-  async create(@Body() body: { question: string; description?: string; outcomes: string[]; author?: string; }) {
+  async create(@Body() body: { category: string; question: string; description?: string; outcomes: string[]; author?: string; }) {
     return this.markets.create(body);
   }
 
