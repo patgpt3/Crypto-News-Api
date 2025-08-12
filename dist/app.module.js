@@ -19,6 +19,8 @@ const replies_module_1 = require("./replies/replies.module");
 const users_module_1 = require("./Users/users.module");
 const auth_module_1 = require("./auth/auth.module");
 const markets_module_1 = require("./markets/markets.module");
+const payments_module_1 = require("./payments/payments.module");
+const memes_module_1 = require("./memes/memes.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -32,6 +34,8 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             markets_module_1.MarketsModule,
+            payments_module_1.PaymentsModule,
+            memes_module_1.MemesModule,
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
                 load: [configuration_1.default],

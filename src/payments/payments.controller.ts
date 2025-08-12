@@ -38,11 +38,17 @@ export class PaymentsController {
 
     const pre = tx.meta?.preBalances || [];
     const post = tx.meta?.postBalances || [];
-    const accountKeys = tx.transaction.message.getAccountKeys();
-    const treasuryIndex = accountKeys.staticAccountKeys.findIndex(k => k.equals(this.treasury));
-    if (treasuryIndex < 0) throw new Error('treasury not in tx');
+    const keys = (tx.transaction.message as any).accountKeys as any[];
+    let treasuryIndex = -1;
+    for (let i = 0; i < keys.length; i++) {
+      try {
+        const pk = typeof keys[i] === 'string' ? new PublicKey(keys[i]) : new PublicKey(keys[i].pubkey || keys[i]);
+        if (pk.equals(this.treasury)) { treasuryIndex = i; break; }
+      } catch {}
+    }
+    if (treasuryIndex < 0) throw new Error('treasury not in tx accounts');
 
-    const delta = (post[treasuryIndex] || 0) - (pre[treasuryIndex] || 0);
+    const delta = (post[treasuryIndex] ?? 0) - (pre[treasuryIndex] ?? 0);
     if (delta < amountLamports * 0.98) throw new Error('insufficient amount received');
 
     // Optional: confirm memo instruction present
