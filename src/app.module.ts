@@ -9,6 +9,7 @@ import { JobsModule } from './jobs/jobs.module';
 import { RepliesModule } from './replies/replies.module';
 import { UsersModule } from './Users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { MarketsModule } from './markets/markets.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthModule } from './auth/auth.module';
     RepliesModule,
     UsersModule,
     AuthModule,
+    MarketsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
