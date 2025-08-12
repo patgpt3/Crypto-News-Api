@@ -51,7 +51,7 @@ export class CommentsService {
     const skip = page * pageSize;
 
     const commentsNewest = await this.commentModel
-      .find({ category: category })
+      .find({ category: category?.toLowerCase() })
       .sort({
         createdAt: -1,
       })
@@ -73,6 +73,10 @@ export class CommentsService {
 
   async create(comment: CommentDTO) {
     const newComment = await new this.commentModel(comment);
+    // normalize category to avoid cross-page bleed
+    if ((newComment as any).category) {
+      (newComment as any).category = (newComment as any).category.toLowerCase();
+    }
 
     //add to user
     const user = await this.usersService.findByUsername(newComment.author);

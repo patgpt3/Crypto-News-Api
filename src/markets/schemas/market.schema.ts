@@ -8,9 +8,20 @@ export const OutcomeSchema = new Schema(
   { _id: true }
 );
 
+const CATEGORY_VALUES = [
+  'crypto',
+  'ai',
+  'memecoins',
+  'depin',
+  'nft',
+  'desci',
+  'film',
+  'gaming',
+] as const;
+
 export const MarketSchema = new Schema(
   {
-    category: { type: String, required: true },
+    category: { type: String, required: true, enum: CATEGORY_VALUES },
     question: { type: String, required: true },
     description: { type: String },
     outcomes: { type: [OutcomeSchema], required: true },
@@ -22,5 +33,11 @@ export const MarketSchema = new Schema(
   },
   { collection: 'markets' }
 );
+
+// Indexes to keep category queries fast and avoid cross-category bleed in listings
+MarketSchema.index({ category: 1, createdAt: -1 });
+MarketSchema.index({ category: 1, question: 1 });
+
+export { CATEGORY_VALUES };
 
 

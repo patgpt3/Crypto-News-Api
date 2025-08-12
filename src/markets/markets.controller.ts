@@ -17,6 +17,10 @@ export class MarketsController {
 
   @Post()
   async create(@Body() body: { category: string; question: string; description?: string; outcomes: string[]; author?: string; }) {
+    if (!body?.category) {
+      throw new Error('category is required');
+    }
+    body.category = body.category.toLowerCase();
     return this.markets.create(body);
   }
 
