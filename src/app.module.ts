@@ -10,6 +10,7 @@ import { RepliesModule } from './replies/replies.module';
 import { UsersModule } from './Users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MarketsModule } from './markets/markets.module';
+import { PaymentsModule } from './payments/payments.module';
 import { MemesModule } from './memes/memes.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { MemesModule } from './memes/memes.module';
     UsersModule,
     AuthModule,
     MarketsModule,
+    PaymentsModule,
     MemesModule,
     ConfigModule.forRoot({
       isGlobal: true,
