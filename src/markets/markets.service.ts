@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-interface OutcomeDoc {
+export interface OutcomeDoc {
   _id: string;
   label: string;
   probability: number;
 }
 
-interface MarketDoc {
+export interface MarketDoc {
   _id: string;
   question: string;
   description?: string;
@@ -20,7 +20,7 @@ interface MarketDoc {
   author?: string;
 }
 
-interface PositionDoc {
+export interface PositionDoc {
   _id: string;
   marketId: string;
   outcomeId: string;
