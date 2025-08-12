@@ -28,7 +28,7 @@ export declare class MarketsService {
     private readonly marketModel;
     private readonly positionModel;
     constructor(marketModel: Model<MarketDoc>, positionModel: Model<PositionDoc>);
-    list(q?: string, category?: string): Promise<(import("mongoose").FlattenMaps<MarketDoc> & Required<{
+    list(q?: string, category?: string, sort?: 'top' | 'new'): Promise<(import("mongoose").FlattenMaps<MarketDoc> & Required<{
         _id: string;
     }>)[]>;
     get(id: string): Promise<import("mongoose").FlattenMaps<MarketDoc> & Required<{
@@ -43,6 +43,10 @@ export declare class MarketsService {
     }): Promise<MarketDoc & Required<{
         _id: string;
     }>>;
+    upvote(id: string): Promise<{
+        ok: boolean;
+        points: any;
+    }>;
     placeBet(marketId: string, params: {
         outcomeId: string;
         amount: number;

@@ -19,8 +19,8 @@ let MarketsController = class MarketsController {
     constructor(markets) {
         this.markets = markets;
     }
-    async list(q, category) {
-        return this.markets.list(q, category);
+    async list(q, category, sort) {
+        return this.markets.list(q, category, sort);
     }
     async get(id) {
         return this.markets.get(id);
@@ -38,14 +38,18 @@ let MarketsController = class MarketsController {
     async positions(id, userId) {
         return this.markets.listPositions(id, userId);
     }
+    async upvote(id) {
+        return this.markets.upvote(id);
+    }
 };
 exports.MarketsController = MarketsController;
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('q')),
     __param(1, (0, common_1.Query)('category')),
+    __param(2, (0, common_1.Query)('sort')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], MarketsController.prototype, "list", null);
 __decorate([
@@ -78,6 +82,13 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], MarketsController.prototype, "positions", null);
+__decorate([
+    (0, common_1.Post)(':id/upvote'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], MarketsController.prototype, "upvote", null);
 exports.MarketsController = MarketsController = __decorate([
     (0, common_1.Controller)('markets'),
     __metadata("design:paramtypes", [markets_service_1.MarketsService])

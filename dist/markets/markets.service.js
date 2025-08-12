@@ -21,7 +21,7 @@ let MarketsService = class MarketsService {
         this.marketModel = marketModel;
         this.positionModel = positionModel;
     }
-    async list(q, category) {
+    async list(q, category, sort) {
         const where = {};
         if (q) {
             where.$or = [
@@ -32,7 +32,8 @@ let MarketsService = class MarketsService {
         if (category) {
             where.category = category.toLowerCase();
         }
-        return this.marketModel.find(where).sort({ createdAt: -1 }).lean();
+        const order = sort === 'new' ? { createdAt: -1 } : { points: -1, createdAt: -1 };
+        return this.marketModel.find(where).sort(order).lean();
     }
     async get(id) {
         const m = await this.marketModel.findById(id).lean();
@@ -51,8 +52,15 @@ let MarketsService = class MarketsService {
             createdAt: new Date(),
             resolved: false,
             author: input.author,
+            points: 0,
         });
         return created.toObject();
+    }
+    async upvote(id) {
+        const updated = await this.marketModel.findByIdAndUpdate(id, { $inc: { points: 1 } }, { new: true });
+        if (!updated)
+            throw new common_1.NotFoundException('Market not found');
+        return { ok: true, points: updated.points };
     }
     async placeBet(marketId, params) {
         const market = await this.marketModel.findById(marketId);

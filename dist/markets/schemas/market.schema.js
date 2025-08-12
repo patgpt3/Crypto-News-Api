@@ -27,7 +27,9 @@ exports.MarketSchema = new mongoose_1.Schema({
     resolved: { type: Boolean, default: false },
     winningOutcomeId: { type: String },
     author: { type: String },
+    points: { type: Number, default: 0 },
 }, { collection: 'markets' });
 exports.MarketSchema.index({ category: 1, createdAt: -1 });
 exports.MarketSchema.index({ category: 1, question: 1 });
+exports.MarketSchema.index({ category: 1, points: -1, createdAt: -1 });
 //# sourceMappingURL=market.schema.js.map

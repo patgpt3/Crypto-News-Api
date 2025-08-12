@@ -17,6 +17,7 @@ declare const CATEGORY_VALUES: readonly ["crypto", "ai", "memecoins", "depin", "
 export declare const MarketSchema: Schema<any, import("mongoose").Model<any, any, any, any, any, any>, {}, {}, {}, {}, {
     collection: string;
 }, {
+    points: number;
     category: "crypto" | "ai" | "memecoins" | "depin" | "nft" | "desci" | "film" | "gaming";
     createdAt: Date;
     question: string;
@@ -30,6 +31,7 @@ export declare const MarketSchema: Schema<any, import("mongoose").Model<any, any
     description?: string;
     winningOutcomeId?: string;
 }, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<{
+    points: number;
     category: "crypto" | "ai" | "memecoins" | "depin" | "nft" | "desci" | "film" | "gaming";
     createdAt: Date;
     question: string;
@@ -43,6 +45,7 @@ export declare const MarketSchema: Schema<any, import("mongoose").Model<any, any
     description?: string;
     winningOutcomeId?: string;
 }>> & import("mongoose").FlatRecord<{
+    points: number;
     category: "crypto" | "ai" | "memecoins" | "depin" | "nft" | "desci" | "film" | "gaming";
     createdAt: Date;
     question: string;

@@ -48,8 +48,8 @@ export class MarketsService {
     if (category) {
       where.category = category.toLowerCase();
     }
-    const order = sort === 'new' ? { createdAt: -1 } : { points: -1, createdAt: -1 };
-    return this.marketModel.find(where).sort(order).lean();
+    const order: any = sort === 'new' ? { createdAt: -1 } : { points: -1, createdAt: -1 };
+    return this.marketModel.find(where).sort(order as any).lean();
   }
 
   async get(id: string) {

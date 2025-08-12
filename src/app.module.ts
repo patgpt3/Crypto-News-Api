@@ -10,6 +10,7 @@ import { RepliesModule } from './replies/replies.module';
 import { UsersModule } from './Users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { MarketsModule } from './markets/markets.module';
+import { MemesModule } from './memes/memes.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MarketsModule } from './markets/markets.module';
     UsersModule,
     AuthModule,
     MarketsModule,
+    MemesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
