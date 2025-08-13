@@ -173,6 +173,102 @@ export class CommentsService {
     const reconciled = await this.itemsService.reconcileCommentCounts();
     return { scanned: all.length, duplicates: dupIds.length, deleted, reconciled } as any;
   }
+
+  private normalizeText(input: string): string {
+    return String(input || '')
+      .toLowerCase()
+      .replace(/https?:\/\/\S+/g, '') // strip urls
+      .replace(/[^a-z0-9\s]/g, '') // keep alphanum/space
+      .replace(/\s+/g, ' ') // collapse ws
+      .trim();
+  }
+
+  private jaccardSimilarity(a: string, b: string): number {
+    const sa = new Set(a.split(' ').filter(Boolean));
+    const sb = new Set(b.split(' ').filter(Boolean));
+    if (sa.size === 0 && sb.size === 0) return 1;
+    let intersect = 0;
+    for (const t of sa) if (sb.has(t)) intersect++;
+    const union = sa.size + sb.size - intersect;
+    return union === 0 ? 0 : intersect / union;
+  }
+
+  async dedupeNearDuplicates(windowMinutes = 120, similarity = 0.9): Promise<{ groups: number; deleted: number; scanned: number; reconciled: { scanned: number; updated: number } }> {
+    const fields: any = { _id: 1, item: 1, author: 1, comment: 1, createdAt: 1 };
+    const all = await this.commentModel.find({}, fields).lean() as any[];
+    // group by item+author
+    const groups = new Map<string, any[]>();
+    for (const c of all) {
+      const key = `${c.item}|${c.author}`;
+      const arr = groups.get(key) || [];
+      arr.push(c);
+      groups.set(key, arr);
+    }
+    let deleted = 0;
+    for (const [, arr] of groups) {
+      arr.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      const keep: any[] = [];
+      for (const c of arr) {
+        const norm = this.normalizeText(c.comment);
+        let isDup = false;
+        for (const k of keep) {
+          const dt = Math.abs(new Date(c.createdAt).getTime() - new Date(k.createdAt).getTime());
+          if (dt > windowMinutes * 60 * 1000) continue;
+          const sim = this.jaccardSimilarity(norm, this.normalizeText(k.comment));
+          if (sim >= similarity) { isDup = true; break; }
+        }
+        if (!isDup) keep.push(c);
+        else {
+          await this.commentModel.deleteOne({ _id: c._id } as any);
+          deleted++;
+        }
+      }
+    }
+    const reconciled = await this.itemsService.reconcileCommentCounts();
+    return { groups: groups.size, deleted, scanned: all.length, reconciled } as any;
+  }
+
+  async purgeItems(itemIds: string[], mode: 'all' | 'auto' = 'auto'): Promise<{ items: number; removed: number; reconciled: { scanned: number; updated: number } }> {
+    let removed = 0;
+    const ids = Array.from(new Set(itemIds.filter(Boolean)));
+    if (ids.length === 0) return { items: 0, removed: 0, reconciled: { scanned: 0, updated: 0 } } as any;
+    if (mode === 'all') {
+      const res = await this.commentModel.deleteMany({ item: { $in: ids } } as any);
+      removed = (res as any)?.deletedCount || 0;
+    } else {
+      for (const itemId of ids) {
+        const rows = await this.commentModel.find({ item: itemId } as any, { _id: 1, author: 1, comment: 1, createdAt: 1 } as any).lean() as any[];
+        // per author on this item
+        const byAuthor = new Map<string, any[]>();
+        for (const r of rows) {
+          const a = byAuthor.get(r.author) || [];
+          a.push(r);
+          byAuthor.set(r.author, a);
+        }
+        for (const [, arr] of byAuthor) {
+          arr.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+          const keep: any[] = [];
+          for (const c of arr) {
+            const norm = this.normalizeText(c.comment);
+            let isDup = false;
+            for (const k of keep) {
+              const dt = Math.abs(new Date(c.createdAt).getTime() - new Date(k.createdAt).getTime());
+              if (dt > 120 * 60 * 1000) continue;
+              const sim = this.jaccardSimilarity(norm, this.normalizeText(k.comment));
+              if (sim >= 0.9) { isDup = true; break; }
+            }
+            if (!isDup) keep.push(c);
+            else {
+              await this.commentModel.deleteOne({ _id: c._id } as any);
+              removed++;
+            }
+          }
+        }
+      }
+    }
+    const reconciled = await this.itemsService.reconcileCommentCounts();
+    return { items: ids.length, removed, reconciled } as any;
+  }
   async delete(id: string): Promise<Comment> {
     return this.commentModel.findByIdAndDelete(id);
   }

@@ -136,4 +136,18 @@ export class CommentsController {
     this.logger.debug('Deduplicate exact duplicate comments');
     return this.commentsService.dedupeExactDuplicates();
   }
+
+  @Post('maintenance/dedupe-near')
+  async dedupeNear(@Body() body: { windowMinutes?: number; similarity?: number }) {
+    const { windowMinutes = 120, similarity = 0.9 } = body || {} as any;
+    this.logger.debug('Deduplicate near-duplicate comments');
+    return this.commentsService.dedupeNearDuplicates(windowMinutes, similarity);
+  }
+
+  @Post('maintenance/purge-items')
+  async purgeItems(@Body() body: { itemIds: string[]; mode?: 'all' | 'auto' }) {
+    const { itemIds = [], mode = 'auto' } = body || {} as any;
+    this.logger.debug('Purge comments by item IDs');
+    return this.commentsService.purgeItems(itemIds, mode);
+  }
 }
