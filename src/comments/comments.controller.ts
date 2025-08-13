@@ -130,4 +130,10 @@ export class CommentsController {
     this.logger.debug('Cleanup inconsistent comments');
     return this.commentsService.cleanupInconsistentComments();
   }
+
+  @Post('maintenance/dedupe')
+  async dedupe() {
+    this.logger.debug('Deduplicate exact duplicate comments');
+    return this.commentsService.dedupeExactDuplicates();
+  }
 }

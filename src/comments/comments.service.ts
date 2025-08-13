@@ -142,6 +142,37 @@ export class CommentsService {
     }
     return { total: all.length, deleted };
   }
+
+  async dedupeExactDuplicates(): Promise<{ scanned: number; duplicates: number; deleted: number; reconciled: { scanned: number; updated: number } }> {
+    const fields: any = { _id: 1, item: 1, author: 1, comment: 1, createdAt: 1 };
+    const all = await this.commentModel.find({}, fields).lean() as any[];
+    const keepByKey = new Map<string, any>();
+    const dupIds: string[] = [];
+    for (const c of all) {
+      const normText = String(c.comment || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase();
+      const key = `${c.item}|${c.author}|${normText}`;
+      const existing = keepByKey.get(key);
+      if (!existing) {
+        keepByKey.set(key, c);
+      } else {
+        // keep earliest createdAt, delete the other
+        const older = (new Date(existing.createdAt).getTime() <= new Date(c.createdAt).getTime()) ? existing : c;
+        const newer = older === existing ? c : existing;
+        keepByKey.set(key, older);
+        dupIds.push(String(newer._id));
+      }
+    }
+    let deleted = 0;
+    if (dupIds.length > 0) {
+      await this.commentModel.deleteMany({ _id: { $in: dupIds } } as any);
+      deleted = dupIds.length;
+    }
+    const reconciled = await this.itemsService.reconcileCommentCounts();
+    return { scanned: all.length, duplicates: dupIds.length, deleted, reconciled } as any;
+  }
   async delete(id: string): Promise<Comment> {
     return this.commentModel.findByIdAndDelete(id);
   }
