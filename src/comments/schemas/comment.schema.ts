@@ -23,6 +23,12 @@ export class Comment extends Document {
 
   @Prop({ type: String, required: false })
   category: string;
+
+  // normalized dedupe key of comment text
+  @Prop({ type: String, required: false, index: true })
+  commentHash?: string;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);
+// prevent exact duplicate comments per item+author
+CommentSchema.index({ item: 1, author: 1, commentHash: 1 }, { unique: true, sparse: true });

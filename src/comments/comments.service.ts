@@ -78,6 +78,16 @@ export class CommentsService {
       (newComment as any).category = (newComment as any).category.toLowerCase();
     }
 
+    // compute dedupe hash: simple normalized text+item+author
+    try {
+      const norm = (newComment.comment || '').trim().replace(/\s+/g, ' ').toLowerCase();
+      const key = `${newComment.item}|${newComment.author}|${norm}`;
+      // lightweight hash
+      let h = 0;
+      for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+      (newComment as any).commentHash = h.toString(16);
+    } catch {}
+
     //add to user
     const user = await this.usersService.findByUsername(newComment.author);
     const newUserComment = user.comments;
@@ -94,7 +104,16 @@ export class CommentsService {
       comments: newItemComments || [newComment.id],
     });
 
-    return newComment.save();
+    try {
+      return await newComment.save();
+    } catch (e: any) {
+      if (e?.code === 11000) {
+        // duplicate key -> return existing duplicate to avoid spam
+        const existing = await this.commentModel.findOne({ item: newComment.item, author: newComment.author, commentHash: (newComment as any).commentHash }).lean();
+        return existing as any;
+      }
+      throw e;
+    }
   }
   async delete(id: string): Promise<Comment> {
     return this.commentModel.findByIdAndDelete(id);
