@@ -204,6 +204,12 @@ export class ItemsController {
     return this.itemsService.update(param.id, itemDTO);
   }
 
+  @Post('maintenance/reconcile-comments')
+  async reconcile() {
+    this.logger.debug('Reconcile item comment counts');
+    return this.itemsService.reconcileCommentCounts();
+  }
+
   @Delete(':id')
   async delete(@Param() param): Promise<Item> {
     this.logger.debug('Delete Item Endpoint');

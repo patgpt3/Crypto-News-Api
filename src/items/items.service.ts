@@ -325,6 +325,23 @@ export class ItemsService {
     return await this.itemModel.findByIdAndUpdate(id, item, { new: true });
   }
 
+  // Recompute each item's comments array to unique existing comment IDs
+  async reconcileCommentCounts(): Promise<{ scanned: number; updated: number }> {
+    const items = await this.itemModel.find({}, { _id: 1, comments: 1 }).lean();
+    let updated = 0;
+    for (const it of items as any[]) {
+      const ids = Array.isArray(it.comments) ? [...new Set(it.comments.filter(Boolean))] : [];
+      if (ids.length === 0) continue;
+      const existing = await this.commentModel.find({ _id: { $in: ids } }, { _id: 1 }).lean();
+      const validIds = existing.map((c: any) => String(c._id));
+      if (JSON.stringify(validIds) !== JSON.stringify(ids)) {
+        await this.itemModel.updateOne({ _id: it._id }, { $set: { comments: validIds } });
+        updated++;
+      }
+    }
+    return { scanned: items.length, updated };
+  }
+
   async upVote(
     id: string,
     currentUser: { currentUserName: string },
