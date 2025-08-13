@@ -13,11 +13,20 @@ export class PaymentsController {
   }
 
   @Post('bet-intent')
-  async betIntent(@Body() body: { marketId: string; amountLamports: number; memo?: string }) {
-    const { marketId, amountLamports } = body;
-    if (!marketId || !amountLamports) {
-      throw new Error('marketId and amountLamports required');
+  async betIntent(@Body() body: { marketId: string; amountLamports?: number; usdAmount?: number; memo?: string }) {
+    const { marketId } = body;
+    let { amountLamports } = body;
+    if (!marketId) throw new Error('marketId required');
+    if (!amountLamports) {
+      // Allow client to pass USD and convert serverside if needed (fallback)
+      const usd = Number(body.usdAmount || 0);
+      if (usd > 0) {
+        // naive passthrough: client should pre-convert; keep server conversion minimal to avoid external deps
+        // assume price is provided later; reject to ensure explicit lamports on mainnet for correctness
+        throw new Error('amountLamports required (client must convert USD to lamports)');
+      }
     }
+    if (!amountLamports || amountLamports <= 0) throw new Error('amountLamports must be > 0');
     const memo = body.memo || JSON.stringify({ t: 'bet', m: marketId, ts: Date.now() });
     return {
       network: 'solana',
