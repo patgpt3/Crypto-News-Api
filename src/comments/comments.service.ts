@@ -122,7 +122,7 @@ export class CommentsService {
   }
 
   async cleanupInconsistentComments(): Promise<{ total: number; deleted: number }> {
-    const all = await this.commentModel.find({}, { _id: 1, item: 1, category: 1 }).lean();
+    const all = await this.commentModel.find({}, { _id: 1, item: 1, category: 1 } as any).lean() as any[];
     let deleted = 0;
     for (const c of all) {
       try {
@@ -133,7 +133,7 @@ export class CommentsService {
           continue;
         }
         const ic = (item as any)?.category ? String((item as any).category).toLowerCase() : undefined;
-        const cc = c?.category ? String(c.category).toLowerCase() : undefined;
+        const cc = (c as any)?.category ? String((c as any).category).toLowerCase() : undefined;
         if (ic && cc && ic !== cc) {
           await this.commentModel.findByIdAndDelete(c._id as any);
           deleted++;
