@@ -124,4 +124,10 @@ export class CommentsController {
     this.logger.debug('Delete Comment Endpoint');
     return this.commentsService.delete(param.id);
   }
+
+  @Post('maintenance/cleanup')
+  async cleanup() {
+    this.logger.debug('Cleanup inconsistent comments');
+    return this.commentsService.cleanupInconsistentComments();
+  }
 }

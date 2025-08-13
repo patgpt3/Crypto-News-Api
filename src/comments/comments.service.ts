@@ -72,11 +72,16 @@ export class CommentsService {
   }
 
   async create(comment: CommentDTO) {
+    // Ensure target item exists and normalize category to the item's category
+    const targetItem = await this.itemsService.findById(comment.item);
+    if (!targetItem) {
+      throw new Error('Target article/item not found');
+    }
     const newComment = await new this.commentModel(comment);
     // normalize category to avoid cross-page bleed
-    if ((newComment as any).category) {
-      (newComment as any).category = (newComment as any).category.toLowerCase();
-    }
+    (newComment as any).category = (targetItem as any)?.category
+      ? String((targetItem as any).category).toLowerCase()
+      : ((newComment as any).category || '').toLowerCase();
 
     // compute dedupe hash: simple normalized text+item+author
     try {
@@ -114,6 +119,28 @@ export class CommentsService {
       }
       throw e;
     }
+  }
+
+  async cleanupInconsistentComments(): Promise<{ total: number; deleted: number }> {
+    const all = await this.commentModel.find({}, { _id: 1, item: 1, category: 1 }).lean();
+    let deleted = 0;
+    for (const c of all) {
+      try {
+        const item = await this.itemsService.findById(c.item as any);
+        if (!item) {
+          await this.commentModel.findByIdAndDelete(c._id as any);
+          deleted++;
+          continue;
+        }
+        const ic = (item as any)?.category ? String((item as any).category).toLowerCase() : undefined;
+        const cc = c?.category ? String(c.category).toLowerCase() : undefined;
+        if (ic && cc && ic !== cc) {
+          await this.commentModel.findByIdAndDelete(c._id as any);
+          deleted++;
+        }
+      } catch {}
+    }
+    return { total: all.length, deleted };
   }
   async delete(id: string): Promise<Comment> {
     return this.commentModel.findByIdAndDelete(id);
