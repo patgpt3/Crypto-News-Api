@@ -279,6 +279,66 @@ export class CommentsService {
     const reconciled = await this.itemsService.reconcileCommentCounts();
     return { authors: norms.length, removed, reconciled } as any;
   }
+
+  // Generate one AI comment per recent article that does not already have a chat-gpt comment
+  async generateAIComments(limit = 25): Promise<{ commented: number; skipped: number; failed: number }> {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not set');
+    }
+    // Get newest items (simple approach)
+    const allItems = await this.itemsService.findAllNewest();
+    const items = (allItems || []).slice(0, Math.max(1, Math.min(100, limit)));
+    let commented = 0; let skipped = 0; let failed = 0;
+    for (const it of items as any[]) {
+      try {
+        const existing = await this.commentModel.findOne({ item: it._id, author: /chat-gpt/i }).lean();
+        if (existing) { skipped++; continue; }
+        const text = await this.callOpenAIToSummarize(String(it.title || ''), String(it.url || ''), String(it.category || ''));
+        if (!text) { skipped++; continue; }
+        const doc: any = {
+          comment: text,
+          item: it._id,
+          author: 'chat-gpt',
+          category: String(it.category || '').toLowerCase(),
+          createdAt: new Date(),
+          isFlagged: 0,
+          points: 0,
+        };
+        const saved = await this.commentModel.create(doc);
+        // Push into item's comments array best-effort
+        try {
+          const current = Array.isArray(it.comments) ? it.comments.slice() : [];
+          current.push(saved._id);
+          await this.itemsService.update(String(it._id), { comments: current } as any);
+        } catch {}
+        commented++;
+      } catch (e) {
+        failed++;
+      }
+    }
+    return { commented, skipped, failed };
+  }
+
+  private async callOpenAIToSummarize(title: string, url: string, category: string): Promise<string | undefined> {
+    const system = `You are a helpful analyst writing one insightful, intelligent, and informative comment about a news item.\n- Keep it 80-140 words.\n- Focus on specific implications, tradeoffs, and what to watch next.\n- If a URL is provided, infer likely context; do not fabricate details.\n- Avoid hype and clichés. No emojis.`;
+    const user = `Title: ${title}\nCategory: ${category || ''}${url ? `\nURL: ${url}` : ''}\nWrite the comment:`;
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: process.env.VITE_OPENAI_MODEL || 'gpt-4o-mini',
+        messages: [ { role: 'system', content: system }, { role: 'user', content: user } ],
+        temperature: 0.6,
+        max_tokens: 220,
+      }),
+    } as any);
+    if (!res.ok) return undefined;
+    const json: any = await res.json();
+    return json?.choices?.[0]?.message?.content?.trim();
+  }
   async delete(id: string): Promise<Comment> {
     return this.commentModel.findByIdAndDelete(id);
   }

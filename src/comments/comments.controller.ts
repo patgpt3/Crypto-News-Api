@@ -157,4 +157,11 @@ export class CommentsController {
     this.logger.debug('Purge comments by authors');
     return this.commentsService.purgeAuthors(authors);
   }
+
+  @Post('maintenance/generate-ai')
+  async generateAI(@Body() body: { limit?: number }) {
+    const { limit = 25 } = body || {} as any;
+    this.logger.debug('Generate AI comments once');
+    return this.commentsService.generateAIComments(limit);
+  }
 }
