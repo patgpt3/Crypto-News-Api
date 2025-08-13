@@ -1,15 +1,40 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { PublicKey, Connection, ParsedInstruction } from '@solana/web3.js';
 
 @Controller('payments')
 export class PaymentsController {
   private connection: Connection;
   private treasury: PublicKey;
+  private priceCache: { usd: number; fetchedAt: number } = { usd: 0, fetchedAt: 0 };
 
   constructor() {
     const rpcUrl = process.env.SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com';
     this.connection = new Connection(rpcUrl, 'confirmed');
     this.treasury = new PublicKey(process.env.SOL_TREASURY_PUBKEY || '11111111111111111111111111111111');
+  }
+
+  private async fetchSolUsd(): Promise<number> {
+    const now = Date.now();
+    if (this.priceCache.usd > 0 && now - this.priceCache.fetchedAt < 30_000) {
+      return this.priceCache.usd;
+    }
+    const url = process.env.SOL_PRICE_API || 'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`price fetch failed: ${res.status}`);
+    const data = await res.json() as any;
+    const usd = Number(data?.solana?.usd || 0);
+    if (!usd) throw new Error('invalid price');
+    this.priceCache = { usd, fetchedAt: now };
+    return usd;
+  }
+
+  @Get('quote')
+  async quote(@Query('usd') usdStr?: string) {
+    const usd = Number(usdStr || '0');
+    if (!(usd > 0)) throw new Error('usd must be > 0');
+    const price = await this.fetchSolUsd();
+    const lamports = Math.floor((usd / price) * 1e9);
+    return { usd, priceUsdPerSol: price, lamports };
   }
 
   @Post('bet-intent')
@@ -18,12 +43,10 @@ export class PaymentsController {
     let { amountLamports } = body;
     if (!marketId) throw new Error('marketId required');
     if (!amountLamports) {
-      // Allow client to pass USD and convert serverside if needed (fallback)
       const usd = Number(body.usdAmount || 0);
       if (usd > 0) {
-        // naive passthrough: client should pre-convert; keep server conversion minimal to avoid external deps
-        // assume price is provided later; reject to ensure explicit lamports on mainnet for correctness
-        throw new Error('amountLamports required (client must convert USD to lamports)');
+        const price = await this.fetchSolUsd();
+        amountLamports = Math.floor((usd / price) * 1e9);
       }
     }
     if (!amountLamports || amountLamports <= 0) throw new Error('amountLamports must be > 0');
