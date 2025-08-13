@@ -150,4 +150,11 @@ export class CommentsController {
     this.logger.debug('Purge comments by item IDs');
     return this.commentsService.purgeItems(itemIds, mode);
   }
+
+  @Post('maintenance/purge-authors')
+  async purgeAuthors(@Body() body: { authors: string[] }) {
+    const { authors = [] } = body || {} as any;
+    this.logger.debug('Purge comments by authors');
+    return this.commentsService.purgeAuthors(authors);
+  }
 }

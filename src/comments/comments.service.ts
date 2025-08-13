@@ -269,6 +269,16 @@ export class CommentsService {
     const reconciled = await this.itemsService.reconcileCommentCounts();
     return { items: ids.length, removed, reconciled } as any;
   }
+
+  async purgeAuthors(authors: string[]): Promise<{ authors: number; removed: number; reconciled: { scanned: number; updated: number } }> {
+    const norms = Array.from(new Set((authors || []).map(a => String(a || '').trim().toLowerCase()).filter(Boolean)));
+    if (norms.length === 0) return { authors: 0, removed: 0, reconciled: { scanned: 0, updated: 0 } } as any;
+    const patterns = norms.map(n => new RegExp(`^${n.replace(/[-\s]+/g, '[-\\s]?')}$`, 'i'));
+    const res = await this.commentModel.deleteMany({ author: { $in: patterns as any } } as any);
+    const removed = (res as any)?.deletedCount || 0;
+    const reconciled = await this.itemsService.reconcileCommentCounts();
+    return { authors: norms.length, removed, reconciled } as any;
+  }
   async delete(id: string): Promise<Comment> {
     return this.commentModel.findByIdAndDelete(id);
   }
